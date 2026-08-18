@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- نسخه ترکیبی پس‌زمینه + نماد، برای دستگاه‌های اندروید ۷ تا ۷.۱ (زیر API 26)
+     که از Adaptive Icon پشتیبانی نمی‌کنند. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/ic_launcher_background" />
+    <item android:drawable="@drawable/ic_launcher_foreground" />
+</layer-list>

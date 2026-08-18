@@ -1,0 +1,37 @@
+name: Build Debug APK
+
+# اجرای خودکار: به محض هر بار push شدن کد به گیت‌هاب،
+# یک فایل APK قابل نصب ساخته می‌شود - بدون نیاز به نصب هیچ‌چیزی روی سیستم شخصی.
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: دریافت کد پروژه
+        uses: actions/checkout@v4
+
+      - name: نصب Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      # از اکشن رسمی Gradle استفاده می‌شود تا نیازی به فایل gradle-wrapper.jar
+      # داخل مخزن نباشد و همیشه نسخه سازگار Gradle به‌صورت خودکار فراهم شود.
+      - name: نصب و اجرای Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: 8.7
+
+      - name: ساخت فایل APK (نسخه Debug)
+        run: gradle assembleDebug --no-daemon
+
+      - name: بارگذاری APK به عنوان خروجی قابل دانلود
+        uses: actions/upload-artifact@v4
+        with:
+          name: NiroResani-debug-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
