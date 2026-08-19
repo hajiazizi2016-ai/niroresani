@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.rasoulhajiazizi.niroresani.ui.catalog.CatalogScreen
 import com.rasoulhajiazizi.niroresani.ui.common.ComingSoonScreen
 import com.rasoulhajiazizi.niroresani.ui.company.CompanyScreen
 import com.rasoulhajiazizi.niroresani.ui.customer.CustomerFormScreen
@@ -14,8 +15,8 @@ import com.rasoulhajiazizi.niroresani.ui.home.HomeScreen
 
 /**
  * ریشه ناوبری برنامه از فاز ۲ به بعد.
- * هر فاز جدید (تجهیزات در فاز ۳، پیش‌فاکتور در فاز ۴) مسیر خودش را
- * به‌جای ComingSoonScreen در این‌جا اضافه می‌کند، بدون نیاز به تغییر ساختار کلی.
+ * هر فاز جدید (پیش‌فاکتور در فاز ۴) مسیر خودش را به‌جای ComingSoonScreen
+ * در این‌جا اضافه می‌کند، بدون نیاز به تغییر ساختار کلی.
  */
 @Composable
 fun NiroResaniNavGraph() {
@@ -29,6 +30,7 @@ fun NiroResaniNavGraph() {
                     when (title) {
                         "شرکت" -> navController.navigate(Routes.COMPANY)
                         "مشتری" -> navController.navigate(Routes.CUSTOMER_LIST)
+                        "تجهیزات" -> navController.navigate(Routes.catalogRoute(null, "بانک تجهیزات"))
                         else -> navController.navigate(Routes.comingSoonRoute(title))
                     }
                 },
@@ -60,6 +62,28 @@ fun NiroResaniNavGraph() {
             })
         ) {
             CustomerFormScreen(onBack = { navController.popBackStack() })
+        }
+
+        composable(
+            route = Routes.CATALOG_ROOT,
+            arguments = listOf(
+                navArgument("parentId") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                },
+                navArgument("title") {
+                    type = NavType.StringType
+                    defaultValue = "بانک تجهیزات"
+                }
+            )
+        ) {
+            CatalogScreen(
+                onBack = { navController.popBackStack() },
+                onCategoryClick = { childId, childTitle ->
+                    navController.navigate(Routes.catalogRoute(childId, childTitle))
+                }
+            )
         }
 
         composable(

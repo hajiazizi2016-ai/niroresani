@@ -13,14 +13,28 @@ android {
         applicationId = "com.rasoulhajiazizi.niroresani"
         minSdk = 24
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 3
+        versionName = "1.2.0"
+    }
+
+    signingConfigs {
+        getByName("debug") {
+            // کلید امضای ثابت اختصاصی پروژه - تضمین می‌کند هر نسخه جدید APK
+            // بدون نیاز به حذف نسخه قبلی، مستقیم روی گوشی آپدیت شود.
+            storeFile = file("debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
+        debug {
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 
