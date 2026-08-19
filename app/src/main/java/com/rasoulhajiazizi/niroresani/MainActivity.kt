@@ -11,7 +11,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import com.rasoulhajiazizi.niroresani.ui.home.HomeScreen
+import com.rasoulhajiazizi.niroresani.navigation.NiroResaniNavGraph
 import com.rasoulhajiazizi.niroresani.ui.splash.SplashScreen
 import com.rasoulhajiazizi.niroresani.ui.theme.NiroResaniTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -31,10 +31,8 @@ class MainActivity : ComponentActivity() {
 }
 
 /**
- * ریشه ناوبری برنامه.
- * فاز فعلی (۰ و ۱): فقط Splash → صفحه اصلی.
- * از فاز ۲ به بعد، NavHost کامل (Navigation Compose) جایگزین این حالت ساده می‌شود
- * تا مسیرهای شرکت/مشتری/تجهیزات/پیش‌فاکتور به آن اضافه شوند.
+ * ریشه برنامه: ابتدا Splash (۳ ثانیه)، سپس گراف کامل ناوبری
+ * (صفحه اصلی → شرکت / مشتری / سایر بخش‌ها).
  */
 @Composable
 private fun AppRoot() {
@@ -43,6 +41,6 @@ private fun AppRoot() {
     if (showSplash) {
         SplashScreen(onFinished = { showSplash = false })
     } else {
-        HomeScreen()
+        NiroResaniNavGraph()
     }
 }
