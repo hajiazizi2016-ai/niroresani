@@ -16,15 +16,21 @@ import com.rasoulhajiazizi.niroresani.core.common.PersianNumberFormatter
 import com.rasoulhajiazizi.niroresani.core.database.entity.CatalogItemEntity
 import com.rasoulhajiazizi.niroresani.core.database.entity.CategoryEntity
 
+enum class CatalogMode { BROWSE, SELECT_FOR_QUOTATION }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CatalogScreen(
+    mode: CatalogMode = CatalogMode.BROWSE,
     onBack: () -> Unit,
     onCategoryClick: (Long, String) -> Unit,
+    onReviewQuotationClick: () -> Unit = {},
     viewModel: CatalogViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val draftItemCount by viewModel.draftItemCount.collectAsState()
     var itemToEditPrice by remember { mutableStateOf<CatalogItemEntity?>(null) }
+    var itemToAddQuantity by remember { mutableStateOf<CatalogItemEntity?>(null) }
 
     Scaffold(
         topBar = {
@@ -36,6 +42,24 @@ fun CatalogScreen(
                     }
                 }
             )
+        },
+        bottomBar = {
+            if (mode == CatalogMode.SELECT_FOR_QUOTATION && draftItemCount > 0) {
+                BottomAppBar {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("$draftItemCount قلم انتخاب شده")
+                        Button(onClick = onReviewQuotationClick) {
+                            Text("مشاهده و ادامه پیش‌فاکتور")
+                        }
+                    }
+                }
+            }
         }
     ) { padding ->
         Column(
@@ -81,7 +105,9 @@ fun CatalogScreen(
                             CatalogItemRow(
                                 item = item,
                                 unitTitle = uiState.unitTitleById[item.unitId] ?: "",
-                                onEditPriceClick = { itemToEditPrice = item }
+                                mode = mode,
+                                onEditPriceClick = { itemToEditPrice = item },
+                                onSelectClick = { itemToAddQuantity = item }
                             )
                         }
                     }
@@ -97,6 +123,18 @@ fun CatalogScreen(
             onDismiss = { itemToEditPrice = null },
             onConfirm = { newPrice ->
                 viewModel.updatePrice(item, newPrice) { itemToEditPrice = null }
+            }
+        )
+    }
+
+    itemToAddQuantity?.let { item ->
+        QuantityEntryDialog(
+            item = item,
+            unitTitle = uiState.unitTitleById[item.unitId] ?: "",
+            onDismiss = { itemToAddQuantity = null },
+            onConfirm = { quantity ->
+                viewModel.addItemToQuotation(item, quantity)
+                itemToAddQuantity = null
             }
         )
     }
@@ -123,9 +161,14 @@ private fun CategoryRow(category: CategoryEntity, onClick: () -> Unit) {
 private fun CatalogItemRow(
     item: CatalogItemEntity,
     unitTitle: String,
-    onEditPriceClick: () -> Unit
+    mode: CatalogMode,
+    onEditPriceClick: () -> Unit,
+    onSelectClick: () -> Unit
 ) {
-    ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+    ElevatedCard(
+        modifier = Modifier.fillMaxWidth(),
+        onClick = if (mode == CatalogMode.SELECT_FOR_QUOTATION) onSelectClick else ({})
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -147,11 +190,65 @@ private fun CatalogItemRow(
                     else MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            IconButton(onClick = onEditPriceClick) {
-                Icon(Icons.Default.Edit, contentDescription = "ویرایش قیمت")
+            if (mode == CatalogMode.BROWSE) {
+                IconButton(onClick = onEditPriceClick) {
+                    Icon(Icons.Default.Edit, contentDescription = "ویرایش قیمت")
+                }
+            } else {
+                IconButton(onClick = onSelectClick) {
+                    Icon(Icons.Default.AddCircle, contentDescription = "افزودن به پیش‌فاکتور")
+                }
             }
         }
     }
+}
+
+@Composable
+private fun QuantityEntryDialog(
+    item: CatalogItemEntity,
+    unitTitle: String,
+    onDismiss: () -> Unit,
+    onConfirm: (Double) -> Unit
+) {
+    var quantityInput by remember { mutableStateOf("1") }
+    var error by remember { mutableStateOf<String?>(null) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(item.title) },
+        text = {
+            Column {
+                Text(
+                    "قیمت واحد: ${PersianNumberFormatter.formatRial(item.currentPrice)} / $unitTitle",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                OutlinedTextField(
+                    value = quantityInput,
+                    onValueChange = { quantityInput = it; error = null },
+                    label = { Text("تعداد ($unitTitle)") },
+                    isError = error != null,
+                    supportingText = { error?.let { Text(it) } },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                val validation = InputValidators.validateQuantity(quantityInput)
+                if (validation is InputValidators.ValidationResult.Invalid) {
+                    error = validation.message
+                } else {
+                    val normalized = PersianNumberFormatter.toLatinDigits(quantityInput).trim().toDouble()
+                    onConfirm(normalized)
+                }
+            }) { Text("افزودن") }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("انصراف") }
+        }
+    )
 }
 
 @Composable

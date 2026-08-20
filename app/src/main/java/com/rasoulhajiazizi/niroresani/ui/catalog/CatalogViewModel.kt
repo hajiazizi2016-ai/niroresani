@@ -12,6 +12,7 @@ import com.rasoulhajiazizi.niroresani.core.database.dao.UnitDao
 import com.rasoulhajiazizi.niroresani.core.database.entity.CatalogItemEntity
 import com.rasoulhajiazizi.niroresani.core.database.entity.CategoryEntity
 import com.rasoulhajiazizi.niroresani.core.database.entity.PriceHistoryEntity
+import com.rasoulhajiazizi.niroresani.ui.quotation.QuotationDraftStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
@@ -42,6 +43,7 @@ class CatalogViewModel @Inject constructor(
     private val catalogItemDao: CatalogItemDao,
     private val unitDao: UnitDao,
     private val priceHistoryDao: PriceHistoryDao,
+    private val draftStore: QuotationDraftStore,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -82,6 +84,16 @@ class CatalogViewModel @Inject constructor(
 
     fun onQueryChange(value: String) {
         queryFlow.value = value
+    }
+
+    /** تعداد اقلام فعلاً انتخاب‌شده در پیش‌نویس پیش‌فاکتور (برای نمایش نوار پایین در حالت انتخاب) */
+    val draftItemCount: StateFlow<Int> = draftStore.state
+        .map { it.items.size }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
+
+    fun addItemToQuotation(item: CatalogItemEntity, quantity: Double) {
+        val unitTitle = uiState.value.unitTitleById[item.unitId] ?: ""
+        draftStore.addItem(item, unitTitle, quantity)
     }
 
     fun updatePrice(item: CatalogItemEntity, newPriceRaw: String, onDone: () -> Unit) {
