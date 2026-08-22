@@ -6,7 +6,13 @@ import com.rasoulhajiazizi.niroresani.core.database.dao.QuotationDao
 import com.rasoulhajiazizi.niroresani.core.database.entity.QuotationEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class QuotationListUiState(
@@ -31,5 +37,10 @@ class QuotationListViewModel @Inject constructor(
 
     fun onQueryChange(value: String) {
         queryFlow.value = value
+    }
+
+    /** حذف پیش‌فاکتور (بخش ۷۷ سند: الزامی به تایید کاربر قبل از حذف). */
+    fun deleteQuotation(quotation: QuotationEntity) {
+        viewModelScope.launch { quotationDao.delete(quotation) }
     }
 }

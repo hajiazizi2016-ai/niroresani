@@ -1,6 +1,10 @@
 package com.rasoulhajiazizi.niroresani.core.database.dao
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Update
 import com.rasoulhajiazizi.niroresani.core.database.entity.CompanyEntity
 import kotlinx.coroutines.flow.Flow
 

@@ -32,10 +32,6 @@ class HomeViewModel @Inject constructor(
         seedDatabaseIfNeeded()
     }
 
-    /**
-     * درج داده اولیه بانک تجهیزات در اولین اجرای برنامه (فاز ۱ نقشه راه).
-     * SeedData.populate خودش بررسی می‌کند که قبلاً داده وارد نشده باشد.
-     */
     private fun seedDatabaseIfNeeded() {
         viewModelScope.launch {
             SeedData.populate(database)

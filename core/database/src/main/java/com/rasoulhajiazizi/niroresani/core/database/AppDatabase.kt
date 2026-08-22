@@ -2,16 +2,27 @@ package com.rasoulhajiazizi.niroresani.core.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.rasoulhajiazizi.niroresani.core.database.dao.*
-import com.rasoulhajiazizi.niroresani.core.database.entity.*
+import com.rasoulhajiazizi.niroresani.core.database.dao.CatalogItemDao
+import com.rasoulhajiazizi.niroresani.core.database.dao.CategoryDao
+import com.rasoulhajiazizi.niroresani.core.database.dao.CompanyDao
+import com.rasoulhajiazizi.niroresani.core.database.dao.CustomerDao
+import com.rasoulhajiazizi.niroresani.core.database.dao.PriceHistoryDao
+import com.rasoulhajiazizi.niroresani.core.database.dao.QuotationDao
+import com.rasoulhajiazizi.niroresani.core.database.dao.QuotationItemDao
+import com.rasoulhajiazizi.niroresani.core.database.dao.SecurityDao
+import com.rasoulhajiazizi.niroresani.core.database.dao.SettingsDao
+import com.rasoulhajiazizi.niroresani.core.database.dao.UnitDao
+import com.rasoulhajiazizi.niroresani.core.database.entity.CatalogItemEntity
+import com.rasoulhajiazizi.niroresani.core.database.entity.CategoryEntity
+import com.rasoulhajiazizi.niroresani.core.database.entity.CompanyEntity
+import com.rasoulhajiazizi.niroresani.core.database.entity.CustomerEntity
+import com.rasoulhajiazizi.niroresani.core.database.entity.PriceHistoryEntity
+import com.rasoulhajiazizi.niroresani.core.database.entity.QuotationEntity
+import com.rasoulhajiazizi.niroresani.core.database.entity.QuotationItemEntity
+import com.rasoulhajiazizi.niroresani.core.database.entity.SecurityEntity
+import com.rasoulhajiazizi.niroresani.core.database.entity.SettingsEntity
+import com.rasoulhajiazizi.niroresani.core.database.entity.UnitEntity
 
-/**
- * دیتابیس اصلی برنامه. نسخه ۱ (MVP).
- *
- * توجه مهم برای توسعه‌دهنده آینده: هرگز از fallbackToDestructiveMigration
- * استفاده نشود؛ طبق الزام سند (بخش‌های ۱۰۷۱، ۱۸۴۷، ۲۰۲۳) هر تغییر ساختار
- * دیتابیس باید با یک Migration صریح همراه شود تا اطلاعات کاربر از بین نرود.
- */
 @Database(
     entities = [
         CompanyEntity::class,

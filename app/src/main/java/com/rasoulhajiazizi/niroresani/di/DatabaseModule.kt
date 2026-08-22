@@ -21,11 +21,7 @@ object DatabaseModule {
             context,
             AppDatabase::class.java,
             AppDatabase.DATABASE_NAME
-        )
-            // هشدار مهم: هرگز fallbackToDestructiveMigration اضافه نشود.
-            // از نسخه ۲ به بعد، Migration صریح تعریف و اینجا با addMigrations() ثبت شود
-            // تا اطلاعات کاربران هنگام بروزرسانی از بین نرود (الزام سند: بخش ۱۰۷۱).
-            .build()
+        ).build()
     }
 
     @Provides

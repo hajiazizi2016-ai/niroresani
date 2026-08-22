@@ -27,6 +27,7 @@ data class QuotationDetailUiState(
 class QuotationDetailViewModel @Inject constructor(
     private val quotationDao: QuotationDao,
     private val quotationItemDao: QuotationItemDao,
+    private val draftStore: QuotationDraftStore,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -35,9 +36,7 @@ class QuotationDetailViewModel @Inject constructor(
 
     init {
         val quotationId = savedStateHandle.get<String>("quotationId")?.toLongOrNull()
-        if (quotationId != null) {
-            load(quotationId)
-        }
+        if (quotationId != null) load(quotationId)
     }
 
     private fun load(id: Long) {
@@ -66,5 +65,37 @@ class QuotationDetailViewModel @Inject constructor(
                 companyName = companyName
             )
         }
+    }
+
+    /**
+     * بارگذاری این پیش‌فاکتور در مخزن پیش‌نویس برای ویرایش (بخش ۷۸ سند).
+     * شماره، تاریخ صدور و اسنپ‌شات شرکت اصلی حفظ می‌شوند.
+     */
+    fun startEdit() {
+        val state = _uiState.value
+        val quotation = state.quotation ?: return
+
+        val draftItems = state.items.map {
+            DraftItem(
+                catalogItemId = it.catalogItemId,
+                title = it.titleSnapshot,
+                unit = it.unitSnapshot,
+                unitPrice = it.unitPriceSnapshot,
+                quantity = it.quantity
+            )
+        }
+
+        draftStore.loadForEditing(
+            quotationId = quotation.id,
+            customerId = quotation.customerId,
+            customerLabel = state.customerName,
+            items = draftItems,
+            description = quotation.description ?: "",
+            originalNumber = quotation.number,
+            originalIssueDateShamsi = quotation.issueDateShamsi,
+            originalIssueDateEpoch = quotation.issueDateEpoch,
+            originalCompanySnapshotJson = quotation.companySnapshotJson,
+            originalCustomerSnapshotJson = quotation.customerSnapshotJson
+        )
     }
 }

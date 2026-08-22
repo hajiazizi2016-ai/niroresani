@@ -4,7 +4,6 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- نماد ساده رعد/برق به رنگ نارنجی تاکیدی، نماینده صنعت برق -->
     <path
         android:fillColor="#E0821C"
         android:pathData="M58,20 L34,60 L52,60 L46,88 L76,48 L58,48 Z" />

@@ -22,11 +22,6 @@ data class CompanyUiState(
     val savedMessage: String? = null
 )
 
-/**
- * مدیریت اطلاعات شرکت. طبق الزام سند (بخش ۸، ۷۱، ۳۳۷، ۳۳۸):
- * اطلاعات شرکت یک‌بار ثبت و همیشه برای پیش‌فاکتورهای جدید استفاده می‌شود؛
- * اسناد قبلی (از طریق Snapshot در Quotation) تحت‌تاثیر تغییرات بعدی قرار نمی‌گیرند.
- */
 @HiltViewModel
 class CompanyViewModel @Inject constructor(
     private val companyDao: CompanyDao

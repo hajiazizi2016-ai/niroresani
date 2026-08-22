@@ -1,9 +1,5 @@
 package com.rasoulhajiazizi.niroresani.navigation
 
-/**
- * تمام مسیرهای ناوبری برنامه در یک مکان مرکزی.
- * فازهای بعدی (تجهیزات، پیش‌فاکتور) مسیرهای خودشان را همینجا اضافه می‌کنند.
- */
 object Routes {
     const val HOME = "home"
     const val COMPANY = "company"

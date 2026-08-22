@@ -30,10 +30,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-/**
- * ریشه برنامه: ابتدا Splash (۳ ثانیه)، سپس گراف کامل ناوبری
- * (صفحه اصلی → شرکت / مشتری / سایر بخش‌ها).
- */
 @Composable
 private fun AppRoot() {
     var showSplash by remember { mutableStateOf(true) }

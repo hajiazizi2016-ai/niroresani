@@ -5,11 +5,6 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
-/**
- * ردیف‌های پیش‌فاکتور. تمام فیلدهای Snapshot (titleSnapshot, unitSnapshot,
- * unitPriceSnapshot) لحظه ثبت کپی می‌شوند و هرگز با تغییرات بعدی بانک تجهیزات
- * به‌روزرسانی نمی‌شوند (بخش ۲۰۱، ۷۴۴، ۸۹۱، ۱۱۵۸، ۱۸۹۱).
- */
 @Entity(
     tableName = "quotation_item",
     foreignKeys = [
@@ -30,6 +25,6 @@ data class QuotationItemEntity(
     val unitSnapshot: String,
     val quantity: Double,
     val unitPriceSnapshot: Long,
-    val lineTotal: Long,               // quantity × unitPriceSnapshot
+    val lineTotal: Long,
     val sortOrder: Int = 0
 )

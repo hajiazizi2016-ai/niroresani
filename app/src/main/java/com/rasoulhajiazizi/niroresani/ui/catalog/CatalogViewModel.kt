@@ -15,7 +15,15 @@ import com.rasoulhajiazizi.niroresani.core.database.entity.PriceHistoryEntity
 import com.rasoulhajiazizi.niroresani.ui.quotation.QuotationDraftStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -26,16 +34,9 @@ data class CatalogUiState(
     val isSearching: Boolean = false,
     val childCategories: List<CategoryEntity> = emptyList(),
     val items: List<CatalogItemEntity> = emptyList(),
-    val unitTitleById: Map<Long, String> = emptyMap(),
-    val priceEditError: String? = null
+    val unitTitleById: Map<Long, String> = emptyMap()
 )
 
-/**
- * مدیریت نمایش درختی بانک تجهیزات (فاز ۳).
- * منطق: parentId == null یعنی سطح ریشه (خط هوایی، پست، مصالح، حمل و نقل، ...).
- * هر دسته می‌تواند هم زیرگروه داشته باشد و هم آیتم مستقیم (مثل «مصالح» که ریشه است
- * اما زیرگروه ندارد و مستقیماً آیتم دارد) - طبق ساختار seed سند اصلی.
- */
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class CatalogViewModel @Inject constructor(
@@ -62,9 +63,7 @@ class CatalogViewModel @Inject constructor(
         unitDao.observeAll().map { units -> units.associate { it.id to it.title } }
 
     val uiState: StateFlow<CatalogUiState> = combine(
-        queryFlow.flatMapLatest { q ->
-            if (q.isBlank()) flowOf(emptyList()) else catalogItemDao.search(q)
-        },
+        queryFlow.flatMapLatest { q -> if (q.isBlank()) flowOf(emptyList()) else catalogItemDao.search(q) },
         childrenFlow,
         itemsFlow,
         unitsFlow,
@@ -79,17 +78,15 @@ class CatalogViewModel @Inject constructor(
             items = if (query.isBlank()) items else searchResults,
             unitTitleById = units
         )
-    }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), CatalogUiState())
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), CatalogUiState())
+
+    val draftItemCount: StateFlow<Int> = draftStore.state
+        .map { it.items.size }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
 
     fun onQueryChange(value: String) {
         queryFlow.value = value
     }
-
-    /** تعداد اقلام فعلاً انتخاب‌شده در پیش‌نویس پیش‌فاکتور (برای نمایش نوار پایین در حالت انتخاب) */
-    val draftItemCount: StateFlow<Int> = draftStore.state
-        .map { it.items.size }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
 
     fun addItemToQuotation(item: CatalogItemEntity, quantity: Double) {
         val unitTitle = uiState.value.unitTitleById[item.unitId] ?: ""
@@ -98,10 +95,7 @@ class CatalogViewModel @Inject constructor(
 
     fun updatePrice(item: CatalogItemEntity, newPriceRaw: String, onDone: () -> Unit) {
         val validation = InputValidators.validatePrice(newPriceRaw)
-        if (validation is InputValidators.ValidationResult.Invalid) {
-            // خطا در قسمت UI dialog مدیریت می‌شود؛ اینجا صرفاً از ادامه جلوگیری می‌کنیم
-            return
-        }
+        if (validation is InputValidators.ValidationResult.Invalid) return
         val newPrice = PersianNumberFormatter.toLatinDigits(newPriceRaw).trim().toLong()
         if (newPrice == item.currentPrice) {
             onDone()
@@ -110,7 +104,6 @@ class CatalogViewModel @Inject constructor(
         viewModelScope.launch {
             val now = System.currentTimeMillis()
             catalogItemDao.updatePrice(item.id, newPrice, now)
-            // حفظ تاریخچه قیمت - الزام حیاتی سند (بخش ۸۹، ۳۶۰، ۸۹۰)
             priceHistoryDao.insert(
                 PriceHistoryEntity(
                     catalogItemId = item.id,

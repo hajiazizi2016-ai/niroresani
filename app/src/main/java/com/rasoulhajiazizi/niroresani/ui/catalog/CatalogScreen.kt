@@ -1,12 +1,43 @@
 package com.rasoulhajiazizi.niroresani.ui.catalog
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.ChevronLeft
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Button
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -47,35 +78,25 @@ fun CatalogScreen(
             if (mode == CatalogMode.SELECT_FOR_QUOTATION && draftItemCount > 0) {
                 BottomAppBar {
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp),
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text("$draftItemCount قلم انتخاب شده")
-                        Button(onClick = onReviewQuotationClick) {
-                            Text("مشاهده و ادامه پیش‌فاکتور")
-                        }
+                        Button(onClick = onReviewQuotationClick) { Text("مشاهده و ادامه پیش‌فاکتور") }
                     }
                 }
             }
         }
     ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-        ) {
+        Column(modifier = Modifier.fillMaxSize().padding(padding)) {
             OutlinedTextField(
                 value = uiState.query,
                 onValueChange = viewModel::onQueryChange,
                 label = { Text("جستجوی تجهیزات") },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 singleLine = true,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
+                modifier = Modifier.fillMaxWidth().padding(16.dp)
             )
 
             val nothingToShow = uiState.childCategories.isEmpty() && uiState.items.isEmpty()
@@ -94,10 +115,7 @@ fun CatalogScreen(
                 ) {
                     if (!uiState.isSearching && uiState.childCategories.isNotEmpty()) {
                         items(uiState.childCategories, key = { "cat_${it.id}" }) { category ->
-                            CategoryRow(
-                                category = category,
-                                onClick = { onCategoryClick(category.id, category.title) }
-                            )
+                            CategoryRow(category = category, onClick = { onCategoryClick(category.id, category.title) })
                         }
                     }
                     if (uiState.items.isNotEmpty()) {
@@ -121,9 +139,7 @@ fun CatalogScreen(
         PriceEditDialog(
             item = item,
             onDismiss = { itemToEditPrice = null },
-            onConfirm = { newPrice ->
-                viewModel.updatePrice(item, newPrice) { itemToEditPrice = null }
-            }
+            onConfirm = { newPrice -> viewModel.updatePrice(item, newPrice) { itemToEditPrice = null } }
         )
     }
 
@@ -144,9 +160,7 @@ fun CatalogScreen(
 private fun CategoryRow(category: CategoryEntity, onClick: () -> Unit) {
     ElevatedCard(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(Icons.Default.Folder, contentDescription = null)
@@ -170,19 +184,14 @@ private fun CatalogItemRow(
         onClick = if (mode == CatalogMode.SELECT_FOR_QUOTATION) onSelectClick else ({})
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(item.title, style = MaterialTheme.typography.titleMedium)
                 Spacer(modifier = Modifier.height(4.dp))
-                val priceText = if (item.currentPrice <= 0L) {
-                    "قیمت ثبت نشده است"
-                } else {
-                    "${PersianNumberFormatter.formatRial(item.currentPrice)} / $unitTitle"
-                }
+                val priceText = if (item.currentPrice <= 0L) "قیمت ثبت نشده است"
+                else "${PersianNumberFormatter.formatRial(item.currentPrice)} / $unitTitle"
                 Text(
                     priceText,
                     style = MaterialTheme.typography.bodyMedium,
@@ -201,6 +210,36 @@ private fun CatalogItemRow(
             }
         }
     }
+}
+
+@Composable
+private fun PriceEditDialog(item: CatalogItemEntity, onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
+    var priceInput by remember { mutableStateOf(if (item.currentPrice > 0) item.currentPrice.toString() else "") }
+    var error by remember { mutableStateOf<String?>(null) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("ویرایش قیمت: ${item.title}") },
+        text = {
+            OutlinedTextField(
+                value = priceInput,
+                onValueChange = { priceInput = it; error = null },
+                label = { Text("قیمت جدید (ریال)") },
+                isError = error != null,
+                supportingText = { error?.let { Text(it) } },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                val validation = InputValidators.validatePrice(priceInput)
+                if (validation is InputValidators.ValidationResult.Invalid) error = validation.message
+                else onConfirm(priceInput)
+            }) { Text("ذخیره") }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("انصراف") } }
+    )
 }
 
 @Composable
@@ -245,51 +284,6 @@ private fun QuantityEntryDialog(
                 }
             }) { Text("افزودن") }
         },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text("انصراف") }
-        }
-    )
-}
-
-@Composable
-private fun PriceEditDialog(
-    item: CatalogItemEntity,
-    onDismiss: () -> Unit,
-    onConfirm: (String) -> Unit
-) {
-    var priceInput by remember {
-        mutableStateOf(if (item.currentPrice > 0) item.currentPrice.toString() else "")
-    }
-    var error by remember { mutableStateOf<String?>(null) }
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("ویرایش قیمت: ${item.title}") },
-        text = {
-            Column {
-                OutlinedTextField(
-                    value = priceInput,
-                    onValueChange = { priceInput = it; error = null },
-                    label = { Text("قیمت جدید (ریال)") },
-                    isError = error != null,
-                    supportingText = { error?.let { Text(it) } },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = {
-                val validation = InputValidators.validatePrice(priceInput)
-                if (validation is InputValidators.ValidationResult.Invalid) {
-                    error = validation.message
-                } else {
-                    onConfirm(priceInput)
-                }
-            }) { Text("ذخیره") }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text("انصراف") }
-        }
+        dismissButton = { TextButton(onClick = onDismiss) { Text("انصراف") } }
     )
 }

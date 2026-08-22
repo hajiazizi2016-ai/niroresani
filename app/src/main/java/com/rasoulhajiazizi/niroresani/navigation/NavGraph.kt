@@ -18,11 +18,6 @@ import com.rasoulhajiazizi.niroresani.ui.quotation.QuotationDetailScreen
 import com.rasoulhajiazizi.niroresani.ui.quotation.QuotationListScreen
 import com.rasoulhajiazizi.niroresani.ui.quotation.QuotationReviewScreen
 
-/**
- * ریشه ناوبری برنامه. از فاز ۴ به بعد، مسیر کامل ایجاد پیش‌فاکتور برقرار است:
- * صفحه اصلی → انتخاب مشتری → انتخاب اقلام (درخت تجهیزات در حالت انتخاب) →
- * بازبینی نهایی → ذخیره → بازگشت به صفحه اصلی.
- */
 @Composable
 fun NiroResaniNavGraph() {
     val navController = rememberNavController()
@@ -62,15 +57,12 @@ fun NiroResaniNavGraph() {
         composable(
             route = Routes.CUSTOMER_FORM_WITH_ID,
             arguments = listOf(navArgument("customerId") {
-                type = NavType.StringType
-                nullable = true
-                defaultValue = null
+                type = NavType.StringType; nullable = true; defaultValue = null
             })
         ) {
             CustomerFormScreen(onBack = { navController.popBackStack() })
         }
 
-        // بانک تجهیزات - حالت مرور عادی (از صفحه اصلی)
         composable(
             route = Routes.CATALOG_ROOT,
             arguments = listOf(
@@ -87,7 +79,6 @@ fun NiroResaniNavGraph() {
             )
         }
 
-        // مرحله ۱ ایجاد پیش‌فاکتور: انتخاب مشتری
         composable(Routes.QUOTATION_CUSTOMER_PICKER) {
             QuotationCustomerPickerScreen(
                 onBack = { navController.popBackStack() },
@@ -98,7 +89,6 @@ fun NiroResaniNavGraph() {
             )
         }
 
-        // مرحله ۲: انتخاب اقلام از بانک تجهیزات (حالت انتخاب برای پیش‌فاکتور)
         composable(
             route = Routes.QUOTATION_CATALOG,
             arguments = listOf(
@@ -116,19 +106,24 @@ fun NiroResaniNavGraph() {
             )
         }
 
-        // مرحله ۳: بازبینی نهایی و ذخیره
         composable(Routes.QUOTATION_REVIEW) {
             QuotationReviewScreen(
                 onBack = { navController.popBackStack() },
-                onSaved = {
-                    navController.navigate(Routes.HOME) {
-                        popUpTo(Routes.HOME) { inclusive = true }
+                onSaved = { quotationId, wasEditing ->
+                    if (wasEditing) {
+                        // بعد از ذخیره ویرایش، به صفحه جزئیات همان پیش‌فاکتور برمی‌گردیم
+                        navController.navigate(Routes.quotationDetailRoute(quotationId)) {
+                            popUpTo(Routes.HOME)
+                        }
+                    } else {
+                        navController.navigate(Routes.HOME) {
+                            popUpTo(Routes.HOME) { inclusive = true }
+                        }
                     }
                 }
             )
         }
 
-        // لیست و جستجوی پیش‌فاکتورهای ذخیره‌شده
         composable(Routes.QUOTATION_LIST) {
             QuotationListScreen(
                 onBack = { navController.popBackStack() },
@@ -140,7 +135,10 @@ fun NiroResaniNavGraph() {
             route = Routes.QUOTATION_DETAIL,
             arguments = listOf(navArgument("quotationId") { type = NavType.StringType })
         ) {
-            QuotationDetailScreen(onBack = { navController.popBackStack() })
+            QuotationDetailScreen(
+                onBack = { navController.popBackStack() },
+                onEditClick = { navController.navigate(Routes.quotationCatalogRoute(null, "ویرایش اقلام")) }
+            )
         }
 
         composable(

@@ -13,14 +13,15 @@ android {
         applicationId = "com.rasoulhajiazizi.niroresani"
         minSdk = 24
         targetSdk = 34
-        versionCode = 4
-        versionName = "1.3.0"
+        versionCode = 5
+        versionName = "1.4.0"
     }
 
     signingConfigs {
         getByName("debug") {
             // کلید امضای ثابت اختصاصی پروژه - تضمین می‌کند هر نسخه جدید APK
             // بدون نیاز به حذف نسخه قبلی، مستقیم روی گوشی آپدیت شود.
+            // هشدار: این فایل (debug.keystore) نباید هرگز بازسازی یا جایگزین شود.
             storeFile = file("debug.keystore")
             storePassword = "android"
             keyAlias = "androiddebugkey"
@@ -76,7 +77,6 @@ dependencies {
     ksp("com.google.dagger:hilt-android-compiler:2.51.1")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
-    // افزوده شده صراحتاً برای اطمینان از دسترسی Room در تمام مراحل کامپایل ماژول app
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
 

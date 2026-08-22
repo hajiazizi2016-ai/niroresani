@@ -31,22 +31,13 @@ private val DarkColors = darkColorScheme(
     error = ErrorRed
 )
 
-/**
- * تم اصلی برنامه - همیشه راست‌به‌چپ (RTL) صرف‌نظر از زبان سیستم،
- * طبق الزام قطعی سند (بخش ۲۰، ۶۴۳، ۸۴۳، ۱۵۸۸).
- */
 @Composable
 fun NiroResaniTheme(
     useDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
     val colors = if (useDarkTheme) DarkColors else LightColors
-
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-        MaterialTheme(
-            colorScheme = colors,
-            typography = AppTypography,
-            content = content
-        )
+        MaterialTheme(colorScheme = colors, typography = AppTypography, content = content)
     }
 }

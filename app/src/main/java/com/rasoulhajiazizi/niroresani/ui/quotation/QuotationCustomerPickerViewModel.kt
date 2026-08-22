@@ -3,22 +3,22 @@ package com.rasoulhajiazizi.niroresani.ui.quotation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rasoulhajiazizi.niroresani.core.database.dao.CustomerDao
+import com.rasoulhajiazizi.niroresani.core.database.entity.CustomerEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 data class QuotationCustomerPickerUiState(
     val query: String = "",
-    val customers: List<com.rasoulhajiazizi.niroresani.core.database.entity.CustomerEntity> = emptyList()
+    val customers: List<CustomerEntity> = emptyList()
 )
 
-/**
- * صفحه انتخاب مشتری در شروع فرآیند ایجاد پیش‌فاکتور.
- * برخلاف CustomerListViewModel عمومی، این نسخه هنگام ورود، هر پیش‌نویس
- * ناتمام قبلی (مثلاً از یک تلاش لغوشده) را پاک می‌کند تا هر «پیش‌فاکتور جدید»
- * همیشه با سبد خالی شروع شود.
- */
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class QuotationCustomerPickerViewModel @Inject constructor(
@@ -36,6 +36,9 @@ class QuotationCustomerPickerViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), QuotationCustomerPickerUiState())
 
     init {
+        // شروع «پیش‌فاکتور جدید» همیشه با سبد خالی است؛ پیش‌نویس ناتمام قبلی پاک می‌شود.
+        // توجه: اگر مسیر ورود از «ویرایش پیش‌فاکتور» بود، این init فراخوانی نمی‌شود
+        // چون آن مسیر مستقیماً به CatalogScreen می‌رود، نه این صفحه.
         draftStore.clear()
     }
 

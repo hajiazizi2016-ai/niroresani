@@ -1,15 +1,9 @@
 package com.rasoulhajiazizi.niroresani.core.common
 
-/**
- * ابزار نمایش اعداد فارسی و مبالغ ریالی.
- * الزام سند: تمام اعداد (تعداد، قیمت، مبلغ، شماره پیش‌فاکتور، تاریخ) باید
- * با ارقام فارسی و جداکننده هزارگان نمایش داده شوند (بخش‌های ۶۱، ۶۲، ۱۱۷۳، ۱۸۹۵).
- */
 object PersianNumberFormatter {
 
     private val persianDigits = charArrayOf('۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹')
 
-    /** تبدیل رشته حاوی ارقام لاتین به ارقام فارسی */
     fun toPersianDigits(input: String): String {
         val sb = StringBuilder()
         for (ch in input) {
@@ -22,21 +16,19 @@ object PersianNumberFormatter {
         return sb.toString()
     }
 
-    /** تبدیل ارقام فارسی/عربی ورودی کاربر به عدد لاتین قابل پردازش (برای فرم‌ها) */
     fun toLatinDigits(input: String): String {
         val sb = StringBuilder()
         for (ch in input) {
             val idx = persianDigits.indexOf(ch)
             when {
                 idx >= 0 -> sb.append(idx)
-                ch in '\u0660'..'\u0669' -> sb.append(ch - '\u0660') // ارقام عربی هم پشتیبانی شود
+                ch in '\u0660'..'\u0669' -> sb.append(ch - '\u0660')
                 else -> sb.append(ch)
             }
         }
         return sb.toString()
     }
 
-    /** جداکننده هزارگان + تبدیل به فارسی، مثال: ۱٬۲۵۰٬۰۰۰ */
     fun formatThousands(amount: Long): String {
         val isNegative = amount < 0
         val absValue = kotlin.math.abs(amount).toString()
@@ -52,6 +44,5 @@ object PersianNumberFormatter {
         return toPersianDigits(finalResult)
     }
 
-    /** فرمت کامل مبلغ با واحد ریال، مثال: ۱٬۲۵۰٬۰۰۰ ریال */
     fun formatRial(amount: Long): String = "${formatThousands(amount)} ریال"
 }

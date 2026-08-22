@@ -2,7 +2,6 @@ package com.rasoulhajiazizi.niroresani.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// پالت رنگی صنعتی/مهندسی - آبی تیره پایه + نارنجی تاکیدی (طبق تحلیل UI/UX سند)
 val NavyPrimary = Color(0xFF16324F)
 val NavyPrimaryDark = Color(0xFF0D1F32)
 val AccentOrange = Color(0xFFE0821C)

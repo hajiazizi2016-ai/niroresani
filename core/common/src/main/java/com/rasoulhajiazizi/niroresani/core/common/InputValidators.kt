@@ -1,9 +1,5 @@
 package com.rasoulhajiazizi.niroresani.core.common
 
-/**
- * اعتبارسنجی ورودی‌های عددی طبق الزام سند (بخش‌های ۲۴۳، ۳۷۴، ۷۵۲، ۱۱۶۰):
- * جلوگیری از مقدار صفر، منفی یا غیرعددی.
- */
 object InputValidators {
 
     sealed class ValidationResult {

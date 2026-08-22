@@ -19,7 +19,6 @@
             </intent-filter>
         </activity>
 
-        <!-- برای اشتراک‌گذاری امن فایل PDF تولیدشده (فاز ۶) -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"

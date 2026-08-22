@@ -1,6 +1,10 @@
 package com.rasoulhajiazizi.niroresani.core.database.dao
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.Query
+import androidx.room.Update
 import com.rasoulhajiazizi.niroresani.core.database.entity.QuotationEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -29,7 +33,6 @@ interface QuotationDao {
     @Delete
     suspend fun delete(quotation: QuotationEntity)
 
-    /** برای تولید شماره خودکار سال‌محور - شمارش پیش‌فاکتورهای همان سال شمسی */
     @Query("SELECT COUNT(*) FROM quotation WHERE number LIKE :yearSuffix")
     suspend fun countForYear(yearSuffix: String): Int
 }

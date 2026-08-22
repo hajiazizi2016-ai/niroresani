@@ -7,10 +7,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 import javax.inject.Singleton
 
-/**
- * یک ردیف در پیش‌فاکتور در حال ساخت. تمام مقادیر Snapshot (لحظه انتخاب) هستند
- * تا طبق الزام حیاتی سند، تغییرات بعدی بانک قیمت روی این پیش‌نویس اثر نگذارد.
- */
 data class DraftItem(
     val catalogItemId: Long,
     val title: String,
@@ -25,17 +21,18 @@ data class QuotationDraftState(
     val customerId: Long? = null,
     val customerLabel: String = "",
     val items: List<DraftItem> = emptyList(),
-    val description: String = ""
+    val description: String = "",
+    val editingQuotationId: Long? = null,
+    val originalNumber: String? = null,
+    val originalIssueDateShamsi: String? = null,
+    val originalIssueDateEpoch: Long? = null,
+    val originalCompanySnapshotJson: String? = null,
+    val originalCustomerSnapshotJson: String? = null
 ) {
     val totalAmount: Long get() = items.sumOf { it.lineTotal }
+    val isEditing: Boolean get() = editingQuotationId != null
 }
 
-/**
- * مخزن سراسری وضعیت پیش‌فاکتور در حال ساخت (فاز ۴).
- * به‌جای انتقال دستی state بین صفحات ناوبری، این Singleton مشترک است
- * تا مسیر «انتخاب مشتری → انتخاب اقلام از چند دسته مختلف → بازبینی نهایی»
- * بدون از‌دست‌رفتن اطلاعات ممکن شود.
- */
 @Singleton
 class QuotationDraftStore @Inject constructor() {
 
@@ -84,6 +81,32 @@ class QuotationDraftStore @Inject constructor() {
 
     fun setDescription(text: String) {
         _state.value = _state.value.copy(description = text)
+    }
+
+    fun loadForEditing(
+        quotationId: Long,
+        customerId: Long,
+        customerLabel: String,
+        items: List<DraftItem>,
+        description: String,
+        originalNumber: String,
+        originalIssueDateShamsi: String,
+        originalIssueDateEpoch: Long,
+        originalCompanySnapshotJson: String,
+        originalCustomerSnapshotJson: String
+    ) {
+        _state.value = QuotationDraftState(
+            customerId = customerId,
+            customerLabel = customerLabel,
+            items = items,
+            description = description,
+            editingQuotationId = quotationId,
+            originalNumber = originalNumber,
+            originalIssueDateShamsi = originalIssueDateShamsi,
+            originalIssueDateEpoch = originalIssueDateEpoch,
+            originalCompanySnapshotJson = originalCompanySnapshotJson,
+            originalCustomerSnapshotJson = originalCustomerSnapshotJson
+        )
     }
 
     fun clear() {

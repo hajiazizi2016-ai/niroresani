@@ -6,7 +6,12 @@ import com.rasoulhajiazizi.niroresani.core.database.dao.CustomerDao
 import com.rasoulhajiazizi.niroresani.core.database.entity.CustomerEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -35,8 +40,6 @@ class CustomerListViewModel @Inject constructor(
     }
 
     fun deleteCustomer(customer: CustomerEntity) {
-        viewModelScope.launch {
-            customerDao.delete(customer)
-        }
+        viewModelScope.launch { customerDao.delete(customer) }
     }
 }

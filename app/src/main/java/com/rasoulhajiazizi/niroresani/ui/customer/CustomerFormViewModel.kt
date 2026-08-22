@@ -25,10 +25,6 @@ data class CustomerFormUiState(
     val isSaved: Boolean = false
 )
 
-/**
- * فرم ثبت/ویرایش مشتری. فیلدها دقیقاً طبق تصمیم قطعی سند (بخش ۳۳۹):
- * فقط نام، نام‌خانوادگی، آدرس، توضیحات — بدون فیلدهای اضافی حذف‌شده.
- */
 @HiltViewModel
 class CustomerFormViewModel @Inject constructor(
     private val customerDao: CustomerDao,
@@ -40,9 +36,7 @@ class CustomerFormViewModel @Inject constructor(
 
     init {
         val customerId = savedStateHandle.get<String>("customerId")?.toLongOrNull()
-        if (customerId != null) {
-            loadCustomer(customerId)
-        }
+        if (customerId != null) loadCustomer(customerId)
     }
 
     private fun loadCustomer(id: Long) {

@@ -24,15 +24,17 @@ data class QuotationReviewUiState(
     val items: List<DraftItem> = emptyList(),
     val description: String = "",
     val totalAmount: Long = 0L,
+    val isEditing: Boolean = false,
     val isSaving: Boolean = false,
     val isSaved: Boolean = false,
+    val savedQuotationId: Long? = null,
     val errorMessage: String? = null
 )
 
 /**
- * صفحه نهایی مسیر ایجاد پیش‌فاکتور (فاز ۴).
- * مسئولیت: نمایش سبد انتخاب‌شده، امکان اصلاح تعداد/حذف، و ذخیره نهایی با
- * Snapshot کامل اطلاعات شرکت و مشتری (الزام حیاتی سند - بخش ۷۸۶، ۲۰۱، ۳۷۰).
+ * صفحه بازبینی نهایی. یک ViewModel هم برای ایجاد پیش‌فاکتور جدید (فاز ۴) و هم
+ * برای ذخیره ویرایش پیش‌فاکتور موجود (فاز ۵) استفاده می‌شود؛ تفکیک بر اساس
+ * QuotationDraftStore.state.editingQuotationId انجام می‌شود.
  */
 @HiltViewModel
 class QuotationReviewViewModel @Inject constructor(
@@ -53,7 +55,8 @@ class QuotationReviewViewModel @Inject constructor(
                     customerLabel = draft.customerLabel,
                     items = draft.items,
                     description = draft.description,
-                    totalAmount = draft.totalAmount
+                    totalAmount = draft.totalAmount,
+                    isEditing = draft.isEditing
                 )
             }
         }
@@ -88,43 +91,51 @@ class QuotationReviewViewModel @Inject constructor(
 
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isSaving = true, errorMessage = null)
-
             val now = System.currentTimeMillis()
-            val shamsiYear = PersianDateFormatter.currentShamsiYear(now)
-            val yearSuffix = "%-$shamsiYear"
-            val countThisYear = quotationDao.countForYear(yearSuffix)
-            val quotationNumber = "${countThisYear + 1}-$shamsiYear"
 
-            val company = companyDao.getCompany()
-            val customer = customerDao.getById(draft.customerId)
-
-            val companySnapshot = JSONObject().apply {
-                put("name", company?.name ?: "")
-                put("registrationNumber", company?.registrationNumber ?: "")
-                put("logoPath", company?.logoPath ?: "")
-            }.toString()
-
-            val customerSnapshot = JSONObject().apply {
-                put("firstName", customer?.firstName ?: "")
-                put("lastName", customer?.lastName ?: "")
-                put("address", customer?.address ?: "")
-            }.toString()
-
-            val quotationId = quotationDao.insert(
-                QuotationEntity(
-                    number = quotationNumber,
-                    issueDateShamsi = PersianDateFormatter.formatFull(now),
-                    issueDateEpoch = now,
-                    customerId = draft.customerId,
-                    companySnapshotJson = companySnapshot,
-                    customerSnapshotJson = customerSnapshot,
-                    description = draft.description.ifBlank { null },
-                    totalAmount = draft.totalAmount,
-                    status = "FINAL",
-                    createdAt = now,
-                    updatedAt = now
+            val quotationId: Long
+            if (draft.isEditing) {
+                quotationId = draft.editingQuotationId!!
+                val customerSnapshot = draft.originalCustomerSnapshotJson ?: buildCustomerSnapshot(draft.customerId)
+                quotationItemDao.deleteAllForQuotation(quotationId)
+                quotationDao.update(
+                    QuotationEntity(
+                        id = quotationId,
+                        number = draft.originalNumber ?: "",
+                        issueDateShamsi = draft.originalIssueDateShamsi ?: PersianDateFormatter.formatFull(now),
+                        issueDateEpoch = draft.originalIssueDateEpoch ?: now,
+                        customerId = draft.customerId,
+                        companySnapshotJson = draft.originalCompanySnapshotJson ?: buildCompanySnapshot(),
+                        customerSnapshotJson = customerSnapshot,
+                        description = draft.description.ifBlank { null },
+                        totalAmount = draft.totalAmount,
+                        status = "FINAL",
+                        createdAt = draft.originalIssueDateEpoch ?: now,
+                        updatedAt = now
+                    )
                 )
-            )
+            } else {
+                val shamsiYear = PersianDateFormatter.currentShamsiYear(now)
+                val yearSuffix = "%-$shamsiYear"
+                val countThisYear = quotationDao.countForYear(yearSuffix)
+                val quotationNumber = "${countThisYear + 1}-$shamsiYear"
+
+                quotationId = quotationDao.insert(
+                    QuotationEntity(
+                        number = quotationNumber,
+                        issueDateShamsi = PersianDateFormatter.formatFull(now),
+                        issueDateEpoch = now,
+                        customerId = draft.customerId,
+                        companySnapshotJson = buildCompanySnapshot(),
+                        customerSnapshotJson = buildCustomerSnapshot(draft.customerId),
+                        description = draft.description.ifBlank { null },
+                        totalAmount = draft.totalAmount,
+                        status = "FINAL",
+                        createdAt = now,
+                        updatedAt = now
+                    )
+                )
+            }
 
             val items = draft.items.mapIndexed { index, item ->
                 QuotationItemEntity(
@@ -141,7 +152,25 @@ class QuotationReviewViewModel @Inject constructor(
             quotationItemDao.insertAll(items)
 
             draftStore.clear()
-            _uiState.value = _uiState.value.copy(isSaving = false, isSaved = true)
+            _uiState.value = _uiState.value.copy(isSaving = false, isSaved = true, savedQuotationId = quotationId)
         }
+    }
+
+    private suspend fun buildCompanySnapshot(): String {
+        val company = companyDao.getCompany()
+        return JSONObject().apply {
+            put("name", company?.name ?: "")
+            put("registrationNumber", company?.registrationNumber ?: "")
+            put("logoPath", company?.logoPath ?: "")
+        }.toString()
+    }
+
+    private suspend fun buildCustomerSnapshot(customerId: Long): String {
+        val customer = customerDao.getById(customerId)
+        return JSONObject().apply {
+            put("firstName", customer?.firstName ?: "")
+            put("lastName", customer?.lastName ?: "")
+            put("address", customer?.address ?: "")
+        }.toString()
     }
 }

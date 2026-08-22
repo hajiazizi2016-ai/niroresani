@@ -1,12 +1,34 @@
 package com.rasoulhajiazizi.niroresani.ui.quotation
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.weight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -18,6 +40,7 @@ import com.rasoulhajiazizi.niroresani.core.database.entity.QuotationItemEntity
 @Composable
 fun QuotationDetailScreen(
     onBack: () -> Unit,
+    onEditClick: () -> Unit,
     viewModel: QuotationDetailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -26,28 +49,38 @@ fun QuotationDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(quotation?.let { "پیش‌فاکتور شماره ${PersianNumberFormatter.toPersianDigits(it.number)}" } ?: "پیش‌فاکتور") },
+                title = {
+                    Text(
+                        quotation?.let { "پیش‌فاکتور شماره ${PersianNumberFormatter.toPersianDigits(it.number)}" }
+                            ?: "پیش‌فاکتور"
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowForward, contentDescription = "بازگشت")
+                    }
+                },
+                actions = {
+                    if (quotation != null) {
+                        IconButton(onClick = {
+                            viewModel.startEdit()
+                            onEditClick()
+                        }) {
+                            Icon(Icons.Default.Edit, contentDescription = "ویرایش پیش‌فاکتور")
+                        }
                     }
                 }
             )
         }
     ) { padding ->
         if (quotation == null) {
-            Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = androidx.compose.ui.Alignment.Center) {
+            Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
             return@Scaffold
         }
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(16.dp)
-        ) {
+        Column(modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp)) {
             Text(uiState.companyName, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(4.dp))
             Text(quotation.issueDateShamsi, style = MaterialTheme.typography.bodyMedium)

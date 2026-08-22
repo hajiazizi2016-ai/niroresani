@@ -4,27 +4,17 @@ import com.rasoulhajiazizi.niroresani.core.database.entity.CatalogItemEntity
 import com.rasoulhajiazizi.niroresani.core.database.entity.CategoryEntity
 import com.rasoulhajiazizi.niroresani.core.database.entity.UnitEntity
 
-/**
- * داده اولیه بانک تجهیزات، دقیقاً طبق ساختار درختی مشخص‌شده در سند اصلی پروژه
- * (بخش‌های ۲۱ تا ۳۶ و ۵۴۵ تا ۵۷۰).
- *
- * این کلاس هنگام اولین اجرای برنامه توسط SeedDatabaseWorker (در ماژول app) فراخوانی می‌شود.
- * قیمت‌های اولیه صفر هستند تا کاربر پیش از هر برآورد، قیمت واقعی بازار را وارد کند
- * (اصل مهم سند: بخش ۲۱۳، ۸۸۶ - قیمت واقعی خرید، نه قیمت فرضی).
- */
 object SeedData {
 
-    // ---- واحدهای اندازه‌گیری ----
     val units = listOf("عدد", "متر", "کیلوگرم", "تن", "سرویس", "ساعت", "روز")
 
     data class SeedCategory(
         val title: String,
         val children: List<SeedCategory> = emptyList(),
-        val items: List<String> = emptyList(), // نام آیتم‌های مستقیم این دسته
+        val items: List<String> = emptyList(),
         val defaultUnit: String = "عدد"
     )
 
-    /** ساختار کامل درخت دسته‌بندی و آیتم‌های اولیه */
     val rootCategories: List<SeedCategory> = listOf(
         SeedCategory(
             title = "خط هوایی",
@@ -129,12 +119,8 @@ object SeedData {
         )
     )
 
-    /**
-     * درج بازگشتی درخت دسته‌بندی + آیتم‌ها در دیتابیس.
-     * fراخوانی از SeedDatabaseWorker (ماژول app) در اولین اجرای برنامه.
-     */
     suspend fun populate(database: AppDatabase) {
-        if (database.catalogItemDao().count() > 0) return // فقط یک‌بار اجرا شود
+        if (database.catalogItemDao().count() > 0) return
 
         val unitIdByName = mutableMapOf<String, Long>()
         units.forEach { unitName ->

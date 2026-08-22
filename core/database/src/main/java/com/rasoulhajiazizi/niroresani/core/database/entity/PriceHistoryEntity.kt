@@ -5,10 +5,6 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
-/**
- * تاریخچه تغییرات قیمت هر آیتم. الزام حیاتی سند (بخش‌های ۸۹، ۳۶۰، ۸۹۰):
- * حفظ کامل سابقه قیمت برای شفافیت و بررسی روند بازار.
- */
 @Entity(
     tableName = "price_history",
     foreignKeys = [

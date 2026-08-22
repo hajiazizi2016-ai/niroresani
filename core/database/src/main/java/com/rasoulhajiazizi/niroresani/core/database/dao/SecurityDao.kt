@@ -1,8 +1,8 @@
 package com.rasoulhajiazizi.niroresani.core.database.dao
 
 import androidx.room.Dao
-import androidx.room.OnConflictStrategy
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.rasoulhajiazizi.niroresani.core.database.entity.SecurityEntity
 import kotlinx.coroutines.flow.Flow
