@@ -20,7 +20,9 @@ data class QuotationDetailUiState(
     val items: List<QuotationItemEntity> = emptyList(),
     val customerName: String = "",
     val customerAddress: String = "",
-    val companyName: String = ""
+    val companyName: String = "",
+    val companyRegistrationNumber: String = "",
+    val companyLogoPath: String? = null
 )
 
 @HiltViewModel
@@ -47,12 +49,16 @@ class QuotationDetailViewModel @Inject constructor(
             var customerName = ""
             var customerAddress = ""
             var companyName = ""
+            var companyRegistrationNumber = ""
+            var companyLogoPath: String? = null
             try {
                 val customerJson = JSONObject(quotation.customerSnapshotJson)
                 customerName = "${customerJson.optString("firstName")} ${customerJson.optString("lastName")}"
                 customerAddress = customerJson.optString("address")
                 val companyJson = JSONObject(quotation.companySnapshotJson)
                 companyName = companyJson.optString("name")
+                companyRegistrationNumber = companyJson.optString("registrationNumber")
+                companyLogoPath = companyJson.optString("logoPath").ifBlank { null }
             } catch (e: Exception) {
                 // نادیده گرفتن خطای احتمالی پارس JSON قدیمی
             }
@@ -62,7 +68,9 @@ class QuotationDetailViewModel @Inject constructor(
                 items = items,
                 customerName = customerName,
                 customerAddress = customerAddress,
-                companyName = companyName
+                companyName = companyName,
+                companyRegistrationNumber = companyRegistrationNumber,
+                companyLogoPath = companyLogoPath
             )
         }
     }
