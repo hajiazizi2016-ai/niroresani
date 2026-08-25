@@ -17,6 +17,8 @@ import com.rasoulhajiazizi.niroresani.ui.quotation.QuotationCustomerPickerScreen
 import com.rasoulhajiazizi.niroresani.ui.quotation.QuotationDetailScreen
 import com.rasoulhajiazizi.niroresani.ui.quotation.QuotationListScreen
 import com.rasoulhajiazizi.niroresani.ui.quotation.QuotationReviewScreen
+import com.rasoulhajiazizi.niroresani.ui.security.SecurityScreen
+import com.rasoulhajiazizi.niroresani.ui.settings.SettingsScreen
 
 @Composable
 fun NiroResaniNavGraph() {
@@ -35,7 +37,7 @@ fun NiroResaniNavGraph() {
                         else -> navController.navigate(Routes.comingSoonRoute(title))
                     }
                 },
-                onSettingsClick = { navController.navigate(Routes.comingSoonRoute("تنظیمات")) },
+                onSettingsClick = { navController.navigate(Routes.SETTINGS) },
                 onContactDeveloperClick = { navController.navigate(Routes.comingSoonRoute("ارتباط با سازنده")) },
                 onSearchClick = { navController.navigate(Routes.QUOTATION_LIST) },
                 onNewQuotationClick = { navController.navigate(Routes.QUOTATION_CUSTOMER_PICKER) }
@@ -44,6 +46,18 @@ fun NiroResaniNavGraph() {
 
         composable(Routes.COMPANY) {
             CompanyScreen(onBack = { navController.popBackStack() })
+        }
+
+        composable(Routes.SETTINGS) {
+            SettingsScreen(
+                onBack = { navController.popBackStack() },
+                onCompanyClick = { navController.navigate(Routes.COMPANY) },
+                onSecurityClick = { navController.navigate(Routes.SECURITY) }
+            )
+        }
+
+        composable(Routes.SECURITY) {
+            SecurityScreen(onBack = { navController.popBackStack() })
         }
 
         composable(Routes.CUSTOMER_LIST) {

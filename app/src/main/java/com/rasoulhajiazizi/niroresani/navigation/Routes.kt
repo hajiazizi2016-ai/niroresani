@@ -3,6 +3,8 @@ package com.rasoulhajiazizi.niroresani.navigation
 object Routes {
     const val HOME = "home"
     const val COMPANY = "company"
+    const val SETTINGS = "settings"
+    const val SECURITY = "security"
     const val CUSTOMER_LIST = "customer_list"
     const val CUSTOMER_FORM = "customer_form"
     const val CUSTOMER_FORM_WITH_ID = "customer_form?customerId={customerId}"
