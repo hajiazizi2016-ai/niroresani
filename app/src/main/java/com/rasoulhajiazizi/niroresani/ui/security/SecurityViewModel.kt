@@ -59,8 +59,9 @@ class SecurityViewModel @Inject constructor(
     fun disablePassword() {
         viewModelScope.launch {
             val existing = securityDao.get()
-            if (existing?.passwordHash != null &&
-                !PasswordHasher.verify(_uiState.value.currentPasswordInput, existing.passwordHash)
+            val existingHash = existing?.passwordHash
+            if (existingHash != null &&
+                !PasswordHasher.verify(_uiState.value.currentPasswordInput, existingHash)
             ) {
                 _uiState.value = _uiState.value.copy(errorMessage = "رمز فعلی صحیح نیست")
                 return@launch
@@ -82,8 +83,9 @@ class SecurityViewModel @Inject constructor(
         if (state.hasExistingPassword) {
             viewModelScope.launch {
                 val existing = securityDao.get()
-                if (existing?.passwordHash != null &&
-                    !PasswordHasher.verify(state.currentPasswordInput, existing.passwordHash)
+                val existingHash = existing?.passwordHash
+                if (existingHash != null &&
+                    !PasswordHasher.verify(state.currentPasswordInput, existingHash)
                 ) {
                     _uiState.value = state.copy(errorMessage = "رمز فعلی صحیح نیست")
                     return@launch

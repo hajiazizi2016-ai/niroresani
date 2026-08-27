@@ -26,9 +26,11 @@ class AppStartupViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             val security = securityDao.get()
+            val enabled = security?.isPasswordEnabled == true
+            val hash = security?.passwordHash
             _uiState.value = AppStartupUiState(
                 isLoading = false,
-                isPasswordRequired = security?.isPasswordEnabled == true && !security.passwordHash.isNullOrBlank()
+                isPasswordRequired = enabled && !hash.isNullOrBlank()
             )
         }
     }
