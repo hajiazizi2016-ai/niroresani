@@ -16,6 +16,7 @@ import com.rasoulhajiazizi.niroresani.ui.home.HomeScreen
 import com.rasoulhajiazizi.niroresani.ui.quotation.QuotationCustomerPickerScreen
 import com.rasoulhajiazizi.niroresani.ui.quotation.QuotationDetailScreen
 import com.rasoulhajiazizi.niroresani.ui.quotation.QuotationListScreen
+import com.rasoulhajiazizi.niroresani.ui.backup.BackupScreen
 import com.rasoulhajiazizi.niroresani.ui.quotation.QuotationReviewScreen
 import com.rasoulhajiazizi.niroresani.ui.security.SecurityScreen
 import com.rasoulhajiazizi.niroresani.ui.settings.SettingsScreen
@@ -52,12 +53,17 @@ fun NiroResaniNavGraph() {
             SettingsScreen(
                 onBack = { navController.popBackStack() },
                 onCompanyClick = { navController.navigate(Routes.COMPANY) },
-                onSecurityClick = { navController.navigate(Routes.SECURITY) }
+                onSecurityClick = { navController.navigate(Routes.SECURITY) },
+                onBackupClick = { navController.navigate(Routes.BACKUP) }
             )
         }
 
         composable(Routes.SECURITY) {
             SecurityScreen(onBack = { navController.popBackStack() })
+        }
+
+        composable(Routes.BACKUP) {
+            BackupScreen(onBack = { navController.popBackStack() })
         }
 
         composable(Routes.CUSTOMER_LIST) {

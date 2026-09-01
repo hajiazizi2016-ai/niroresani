@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Apartment
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Backup
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material3.ElevatedCard
@@ -35,11 +36,13 @@ private data class SettingsItem(val title: String, val icon: ImageVector, val ro
 fun SettingsScreen(
     onBack: () -> Unit,
     onCompanyClick: () -> Unit,
-    onSecurityClick: () -> Unit
+    onSecurityClick: () -> Unit,
+    onBackupClick: () -> Unit
 ) {
     val items = listOf(
         SettingsItem("اطلاعات شرکت", Icons.Default.Apartment, "company"),
-        SettingsItem("امنیت", Icons.Default.Security, "security")
+        SettingsItem("امنیت", Icons.Default.Security, "security"),
+        SettingsItem("پشتیبان‌گیری و بازیابی", Icons.Default.Backup, "backup")
     )
 
     Scaffold(
@@ -60,7 +63,13 @@ fun SettingsScreen(
         ) {
             items(items) { item ->
                 ElevatedCard(
-                    onClick = { if (item.route == "company") onCompanyClick() else onSecurityClick() },
+                    onClick = {
+                        when (item.route) {
+                            "company" -> onCompanyClick()
+                            "security" -> onSecurityClick()
+                            "backup" -> onBackupClick()
+                        }
+                    },
                     modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
                 ) {
                     Row(
