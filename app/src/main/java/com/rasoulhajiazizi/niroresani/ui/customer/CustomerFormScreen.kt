@@ -23,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.rasoulhajiazizi.niroresani.ui.common.UnsavedChangesGuard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,6 +36,15 @@ fun CustomerFormScreen(
     LaunchedEffect(uiState.isSaved) {
         if (uiState.isSaved) onBack()
     }
+
+    // هشدار خروج با اطلاعات ذخیره‌نشده - الزام صریح بخش ۱۷ سند.
+    // چون LaunchedEffect بالا خودش بعد از ذخیره موفق onBack را صدا می‌زند،
+    // اینجا کافی است فقط save() فراخوانی شود.
+    UnsavedChangesGuard(
+        hasUnsavedChanges = uiState.hasUnsavedChanges,
+        onSaveAndExit = { viewModel.save() },
+        onExitWithoutSaving = onBack
+    )
 
     Scaffold(
         topBar = {

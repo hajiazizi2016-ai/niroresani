@@ -126,23 +126,19 @@ fun NiroResaniNavGraph() {
             )
         }
 
-        composable(Routes.QUOTATION_REVIEW) {
-            QuotationReviewScreen(
-                onBack = { navController.popBackStack() },
-                onSaved = { quotationId, wasEditing ->
-                    if (wasEditing) {
-                        // بعد از ذخیره ویرایش، به صفحه جزئیات همان پیش‌فاکتور برمی‌گردیم
-                        navController.navigate(Routes.quotationDetailRoute(quotationId)) {
-                            popUpTo(Routes.HOME)
-                        }
-                    } else {
-                        navController.navigate(Routes.HOME) {
-                            popUpTo(Routes.HOME) { inclusive = true }
-                        }
-                    }
-                }
-            )
+       composable(Routes.QUOTATION_REVIEW) {
+    QuotationReviewScreen(
+        onBack = { navController.popBackStack() },
+        onDiscardDraft = {
+            navController.navigate(Routes.HOME) {
+                popUpTo(Routes.HOME) { inclusive = true }
+            }
+        },
+        onSaved = { quotationId, wasEditing ->
+            ...
         }
+    )
+}
 
         composable(Routes.QUOTATION_LIST) {
             QuotationListScreen(

@@ -33,8 +33,7 @@ data class QuotationReviewUiState(
 
 /**
  * صفحه بازبینی نهایی. یک ViewModel هم برای ایجاد پیش‌فاکتور جدید (فاز ۴) و هم
- * برای ذخیره ویرایش پیش‌فاکتور موجود (فاز ۵) استفاده می‌شود؛ تفکیک بر اساس
- * QuotationDraftStore.state.editingQuotationId انجام می‌شود.
+ * برای ذخیره ویرایش پیش‌فاکتور موجود (فاز ۵) استفاده می‌شود.
  */
 @HiltViewModel
 class QuotationReviewViewModel @Inject constructor(
@@ -76,6 +75,11 @@ class QuotationReviewViewModel @Inject constructor(
 
     fun onDescriptionChange(text: String) {
         draftStore.setDescription(text)
+    }
+
+    /** انصراف کامل از پیش‌نویس در حال ساخت - بخش ۱۷ سند (خروج بدون ذخیره) */
+    fun discardDraft() {
+        draftStore.clear()
     }
 
     fun save() {

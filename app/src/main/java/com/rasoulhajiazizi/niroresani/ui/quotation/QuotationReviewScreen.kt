@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.weight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
@@ -42,12 +43,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.rasoulhajiazizi.niroresani.core.common.PersianNumberFormatter
+import com.rasoulhajiazizi.niroresani.ui.common.UnsavedChangesGuard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QuotationReviewScreen(
     onBack: () -> Unit,
     onSaved: (quotationId: Long, wasEditing: Boolean) -> Unit,
+    onDiscardDraft: () -> Unit,
     viewModel: QuotationReviewViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -62,6 +65,17 @@ fun QuotationReviewScreen(
     LaunchedEffect(uiState.errorMessage) {
         uiState.errorMessage?.let { snackbarHostState.showSnackbar(it) }
     }
+
+    // هشدار خروج با اطلاعات ذخیره‌نشده - الزام صریح بخش ۱۷ سند.
+    // «خروج بدون ذخیره» پیش‌نویس را کامل پاک کرده و به صفحه اصلی برمی‌گردد.
+    UnsavedChangesGuard(
+        hasUnsavedChanges = uiState.items.isNotEmpty() && !uiState.isSaved,
+        onSaveAndExit = { viewModel.save() },
+        onExitWithoutSaving = {
+            viewModel.discardDraft()
+            onDiscardDraft()
+        }
+    )
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },

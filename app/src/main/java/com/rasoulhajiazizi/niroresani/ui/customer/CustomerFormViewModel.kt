@@ -22,8 +22,19 @@ data class CustomerFormUiState(
     val originalCreatedAt: Long = System.currentTimeMillis(),
     val firstNameError: String? = null,
     val isSaving: Boolean = false,
-    val isSaved: Boolean = false
-)
+    val isSaved: Boolean = false,
+    // اسنپ‌شات آخرین وضعیت ذخیره‌شده - برای تشخیص «تغییر ذخیره‌نشده» (بخش ۱۷ سند)
+    val lastSavedFirstName: String = "",
+    val lastSavedLastName: String = "",
+    val lastSavedAddress: String = "",
+    val lastSavedDescription: String = ""
+) {
+    val hasUnsavedChanges: Boolean
+        get() = firstName != lastSavedFirstName ||
+            lastName != lastSavedLastName ||
+            address != lastSavedAddress ||
+            description != lastSavedDescription
+}
 
 @HiltViewModel
 class CustomerFormViewModel @Inject constructor(
@@ -48,7 +59,11 @@ class CustomerFormViewModel @Inject constructor(
                     lastName = customer.lastName,
                     address = customer.address,
                     description = customer.description ?: "",
-                    originalCreatedAt = customer.createdAt
+                    originalCreatedAt = customer.createdAt,
+                    lastSavedFirstName = customer.firstName,
+                    lastSavedLastName = customer.lastName,
+                    lastSavedAddress = customer.address,
+                    lastSavedDescription = customer.description ?: ""
                 )
             }
         }
@@ -101,7 +116,14 @@ class CustomerFormViewModel @Inject constructor(
                     )
                 )
             }
-            _uiState.value = _uiState.value.copy(isSaving = false, isSaved = true)
+            _uiState.value = _uiState.value.copy(
+                isSaving = false,
+                isSaved = true,
+                lastSavedFirstName = state.firstName,
+                lastSavedLastName = state.lastName,
+                lastSavedAddress = state.address,
+                lastSavedDescription = state.description
+            )
         }
     }
 }
