@@ -126,7 +126,7 @@ fun NiroResaniNavGraph() {
             )
         }
 
-       composable(Routes.QUOTATION_REVIEW) {
+     composable(Routes.QUOTATION_REVIEW) {
     QuotationReviewScreen(
         onBack = { navController.popBackStack() },
         onDiscardDraft = {
@@ -135,7 +135,15 @@ fun NiroResaniNavGraph() {
             }
         },
         onSaved = { quotationId, wasEditing ->
-            ...
+            if (wasEditing) {
+                navController.navigate(Routes.quotationDetailRoute(quotationId)) {
+                    popUpTo(Routes.HOME)
+                }
+            } else {
+                navController.navigate(Routes.HOME) {
+                    popUpTo(Routes.HOME) { inclusive = true }
+                }
+            }
         }
     )
 }
