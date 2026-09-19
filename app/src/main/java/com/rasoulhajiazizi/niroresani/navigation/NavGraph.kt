@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.rasoulhajiazizi.niroresani.ui.backup.BackupScreen
 import com.rasoulhajiazizi.niroresani.ui.catalog.CatalogMode
 import com.rasoulhajiazizi.niroresani.ui.catalog.CatalogScreen
 import com.rasoulhajiazizi.niroresani.ui.common.ComingSoonScreen
@@ -16,11 +17,13 @@ import com.rasoulhajiazizi.niroresani.ui.home.HomeScreen
 import com.rasoulhajiazizi.niroresani.ui.quotation.QuotationCustomerPickerScreen
 import com.rasoulhajiazizi.niroresani.ui.quotation.QuotationDetailScreen
 import com.rasoulhajiazizi.niroresani.ui.quotation.QuotationListScreen
-import com.rasoulhajiazizi.niroresani.ui.backup.BackupScreen
 import com.rasoulhajiazizi.niroresani.ui.quotation.QuotationReviewScreen
 import com.rasoulhajiazizi.niroresani.ui.security.SecurityScreen
 import com.rasoulhajiazizi.niroresani.ui.settings.SettingsScreen
 
+/**
+ * ریشه ناوبری کامل برنامه (فازهای ۱ تا ۹).
+ */
 @Composable
 fun NiroResaniNavGraph() {
     val navController = rememberNavController()
@@ -77,12 +80,15 @@ fun NiroResaniNavGraph() {
         composable(
             route = Routes.CUSTOMER_FORM_WITH_ID,
             arguments = listOf(navArgument("customerId") {
-                type = NavType.StringType; nullable = true; defaultValue = null
+                type = NavType.StringType
+                nullable = true
+                defaultValue = null
             })
         ) {
             CustomerFormScreen(onBack = { navController.popBackStack() })
         }
 
+        // بانک تجهیزات - حالت مرور عادی (از صفحه اصلی)
         composable(
             route = Routes.CATALOG_ROOT,
             arguments = listOf(
@@ -99,6 +105,7 @@ fun NiroResaniNavGraph() {
             )
         }
 
+        // مرحله ۱ ایجاد پیش‌فاکتور: انتخاب مشتری
         composable(Routes.QUOTATION_CUSTOMER_PICKER) {
             QuotationCustomerPickerScreen(
                 onBack = { navController.popBackStack() },
@@ -109,6 +116,7 @@ fun NiroResaniNavGraph() {
             )
         }
 
+        // مرحله ۲: انتخاب اقلام از بانک تجهیزات (حالت انتخاب برای پیش‌فاکتور)
         composable(
             route = Routes.QUOTATION_CATALOG,
             arguments = listOf(
@@ -126,28 +134,30 @@ fun NiroResaniNavGraph() {
             )
         }
 
-     composable(Routes.QUOTATION_REVIEW) {
-    QuotationReviewScreen(
-        onBack = { navController.popBackStack() },
-        onDiscardDraft = {
-            navController.navigate(Routes.HOME) {
-                popUpTo(Routes.HOME) { inclusive = true }
-            }
-        },
-        onSaved = { quotationId, wasEditing ->
-            if (wasEditing) {
-                navController.navigate(Routes.quotationDetailRoute(quotationId)) {
-                    popUpTo(Routes.HOME)
+        // مرحله ۳: بازبینی نهایی و ذخیره
+        composable(Routes.QUOTATION_REVIEW) {
+            QuotationReviewScreen(
+                onBack = { navController.popBackStack() },
+                onDiscardDraft = {
+                    navController.navigate(Routes.HOME) {
+                        popUpTo(Routes.HOME) { inclusive = true }
+                    }
+                },
+                onSaved = { quotationId, wasEditing ->
+                    if (wasEditing) {
+                        navController.navigate(Routes.quotationDetailRoute(quotationId)) {
+                            popUpTo(Routes.HOME)
+                        }
+                    } else {
+                        navController.navigate(Routes.HOME) {
+                            popUpTo(Routes.HOME) { inclusive = true }
+                        }
+                    }
                 }
-            } else {
-                navController.navigate(Routes.HOME) {
-                    popUpTo(Routes.HOME) { inclusive = true }
-                }
-            }
+            )
         }
-    )
-}
 
+        // لیست و جستجوی پیش‌فاکتورهای ذخیره‌شده
         composable(Routes.QUOTATION_LIST) {
             QuotationListScreen(
                 onBack = { navController.popBackStack() },
