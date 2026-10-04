@@ -11,6 +11,7 @@ object Routes {
     const val CUSTOMER_FORM_WITH_ID = "customer_form?customerId={customerId}"
     const val CATALOG_ROOT = "catalog?parentId={parentId}&title={title}"
     const val COMING_SOON = "coming_soon/{title}"
+    const val CONTACT_DEVELOPER = "contact_developer"
 
     const val QUOTATION_CUSTOMER_PICKER = "quotation_customer_picker"
     const val QUOTATION_CATALOG = "quotation_catalog?parentId={parentId}&title={title}"

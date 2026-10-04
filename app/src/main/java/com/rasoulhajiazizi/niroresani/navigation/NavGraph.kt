@@ -11,6 +11,7 @@ import com.rasoulhajiazizi.niroresani.ui.catalog.CatalogMode
 import com.rasoulhajiazizi.niroresani.ui.catalog.CatalogScreen
 import com.rasoulhajiazizi.niroresani.ui.common.ComingSoonScreen
 import com.rasoulhajiazizi.niroresani.ui.company.CompanyScreen
+import com.rasoulhajiazizi.niroresani.ui.contact.ContactDeveloperScreen
 import com.rasoulhajiazizi.niroresani.ui.customer.CustomerFormScreen
 import com.rasoulhajiazizi.niroresani.ui.customer.CustomerListScreen
 import com.rasoulhajiazizi.niroresani.ui.home.HomeScreen
@@ -22,7 +23,7 @@ import com.rasoulhajiazizi.niroresani.ui.security.SecurityScreen
 import com.rasoulhajiazizi.niroresani.ui.settings.SettingsScreen
 
 /**
- * ریشه ناوبری کامل برنامه (فازهای ۱ تا ۹).
+ * ریشه ناوبری کامل برنامه (فازهای ۱ تا ۱۰).
  */
 @Composable
 fun NiroResaniNavGraph() {
@@ -42,7 +43,7 @@ fun NiroResaniNavGraph() {
                     }
                 },
                 onSettingsClick = { navController.navigate(Routes.SETTINGS) },
-                onContactDeveloperClick = { navController.navigate(Routes.comingSoonRoute("ارتباط با سازنده")) },
+                onContactDeveloperClick = { navController.navigate(Routes.CONTACT_DEVELOPER) },
                 onSearchClick = { navController.navigate(Routes.QUOTATION_LIST) },
                 onNewQuotationClick = { navController.navigate(Routes.QUOTATION_CUSTOMER_PICKER) }
             )
@@ -50,6 +51,10 @@ fun NiroResaniNavGraph() {
 
         composable(Routes.COMPANY) {
             CompanyScreen(onBack = { navController.popBackStack() })
+        }
+
+        composable(Routes.CONTACT_DEVELOPER) {
+            ContactDeveloperScreen(onBack = { navController.popBackStack() })
         }
 
         composable(Routes.SETTINGS) {
@@ -87,8 +92,7 @@ fun NiroResaniNavGraph() {
         ) {
             CustomerFormScreen(onBack = { navController.popBackStack() })
         }
-
-        // بانک تجهیزات - حالت مرور عادی (از صفحه اصلی)
+// بانک تجهیزات - حالت مرور عادی (از صفحه اصلی)
         composable(
             route = Routes.CATALOG_ROOT,
             arguments = listOf(
