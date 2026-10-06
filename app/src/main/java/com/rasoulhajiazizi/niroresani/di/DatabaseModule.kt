@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.rasoulhajiazizi.niroresani.core.database.AppDatabase
 import com.rasoulhajiazizi.niroresani.core.database.MIGRATION_1_2
+import com.rasoulhajiazizi.niroresani.core.database.MIGRATION_2_3
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,7 +24,7 @@ object DatabaseModule {
             AppDatabase::class.java,
             AppDatabase.DATABASE_NAME
         )
-            .addMigrations(MIGRATION_1_2)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
             .build()
     }
 

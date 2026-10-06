@@ -13,8 +13,8 @@ android {
         applicationId = "com.rasoulhajiazizi.niroresani"
         minSdk = 24
         targetSdk = 34
-        versionCode = 12
-        versionName = "1.9.0"
+        versionCode = 13
+        versionName = "1.10.0"
     }
 
     signingConfigs {

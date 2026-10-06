@@ -16,4 +16,7 @@ interface UnitDao {
 
     @Insert
     suspend fun insertAll(units: List<UnitEntity>): List<Long>
+
+    @Query("DELETE FROM unit")
+    suspend fun deleteAll()
 }

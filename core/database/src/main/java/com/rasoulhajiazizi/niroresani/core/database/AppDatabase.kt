@@ -37,7 +37,7 @@ import com.rasoulhajiazizi.niroresani.core.database.entity.UnitEntity
         SettingsEntity::class,
         SecurityEntity::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -77,5 +77,21 @@ val MIGRATION_1_2 = object : androidx.room.migration.Migration(1, 2) {
         db.execSQL("ALTER TABLE customer ADD COLUMN planSubject TEXT DEFAULT NULL")
         db.execSQL("ALTER TABLE customer ADD COLUMN planCode TEXT DEFAULT NULL")
         db.execSQL("ALTER TABLE customer ADD COLUMN phone TEXT DEFAULT NULL")
+    }
+}
+
+/**
+ * Migration نسخه ۲ به ۳ - افزودن ستون ترتیب نمایش (sortOrder) به تجهیزات بانک اطلاعاتی
+ * تا ترتیب دقیق موردنظر کاربر (نه ترتیب الفبایی) در لیست‌ها حفظ شود. محتوای واقعی بانک
+ * تجهیزات (دسته‌ها و آیتم‌ها) توسط SeedData.populate() بر اساس یک شماره نسخه‌ی بذر
+ * (seed version) ذخیره‌شده در جدول settings بازسازی می‌شود - نه در این Migration -
+ * چون جایگزینی کامل درخت تجهیزات به منطق Kotlin نیاز دارد. این بازسازی هرگز
+ * پیش‌فاکتورهای ثبت‌شده‌ی قبلی کاربر را دستکاری نمی‌کند، چون تمام اطلاعات آیتم‌های هر
+ * پیش‌فاکتور به‌صورت Snapshot (titleSnapshot/unitSnapshot/unitPriceSnapshot) مستقیماً
+ * در جدول quotation_item ذخیره شده و هیچ وابستگی کلید خارجی به catalog_item ندارد.
+ */
+val MIGRATION_2_3 = object : androidx.room.migration.Migration(2, 3) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE catalog_item ADD COLUMN sortOrder INTEGER NOT NULL DEFAULT 0")
     }
 }

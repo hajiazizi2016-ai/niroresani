@@ -2,9 +2,19 @@ package com.rasoulhajiazizi.niroresani.core.database
 
 import com.rasoulhajiazizi.niroresani.core.database.entity.CatalogItemEntity
 import com.rasoulhajiazizi.niroresani.core.database.entity.CategoryEntity
+import com.rasoulhajiazizi.niroresani.core.database.entity.SettingsEntity
 import com.rasoulhajiazizi.niroresani.core.database.entity.UnitEntity
 
 object SeedData {
+
+    /**
+     * شماره نسخه‌ی ساختار بانک تجهیزات. هر بار که درخت دسته‌ها/آیتم‌ها (rootCategories)
+     * تغییر می‌کند، این عدد باید افزایش یابد تا populate() بانک تجهیزات قدیمی را حذف و
+     * نسخه‌ی جدید را جایگزین کند. این کار هرگز روی پیش‌فاکتورهای ثبت‌شده‌ی قبلی کاربر اثر
+     * نمی‌گذارد چون آن‌ها Snapshot مستقل از بانک تجهیزات هستند.
+     */
+    private const val CATALOG_SEED_VERSION = "2"
+    private const val SETTINGS_KEY_CATALOG_SEED_VERSION = "catalog_seed_version"
 
     val units = listOf("عدد", "متر", "کیلوگرم", "تن", "سرویس", "ساعت", "روز")
 
@@ -17,110 +27,138 @@ object SeedData {
 
     val rootCategories: List<SeedCategory> = listOf(
         SeedCategory(
-            title = "خط هوایی",
-            children = listOf(
-                SeedCategory(
-                    title = "فشار متوسط ۲۰ کیلوولت",
-                    children = listOf(
-                        SeedCategory(
-                            title = "تیرهای بتنی",
-                            items = listOf(
-                                "تیر بتنی ۱۵/۸۰۰",
-                                "تیر بتنی ۱۵/۶۰۰",
-                                "تیر بتنی ۱۵/۴۰۰",
-                                "تیر بتنی ۱۲/۸۰۰",
-                                "تیر بتنی ۱۲/۶۰۰",
-                                "تیر بتنی ۱۲/۴۰۰"
-                            )
-                        ),
-                        SeedCategory(title = "کراس آرم‌ها", items = listOf("کراس آرم استاندارد")),
-                        SeedCategory(title = "پیچ و مهره‌ها", items = listOf("پیچ و مهره استاندارد", "واشر")),
-                        SeedCategory(title = "مقره‌ها", items = listOf("مقره سوزنی", "مقره آویزی")),
-                        SeedCategory(title = "گیره‌ها", items = listOf("گیره انتهایی", "گیره اتصال")),
-                        SeedCategory(title = "یراق‌آلات", items = listOf("یراق‌آلات استاندارد فشار متوسط")),
-                        SeedCategory(title = "تجهیزات تکمیلی", items = listOf("تجهیزات تکمیلی شبکه فشار متوسط"))
-                    )
-                ),
-                SeedCategory(
-                    title = "فشار ضعیف ۴۰۰ ولت",
-                    children = listOf(
-                        SeedCategory(title = "تیرها", items = listOf("تیر بتنی فشار ضعیف")),
-                        SeedCategory(title = "سیم‌ها", items = listOf("سیم مسی هوایی"), defaultUnit = "متر"),
-                        SeedCategory(title = "کابل‌ها", items = listOf("کابل خودنگهدار"), defaultUnit = "متر"),
-                        SeedCategory(title = "یراق‌آلات", items = listOf("یراق‌آلات فشار ضعیف")),
-                        SeedCategory(title = "تجهیزات نصب", items = listOf("تجهیزات نصب فشار ضعیف"))
-                    )
-                )
-            )
-        ),
-        SeedCategory(
-            title = "پست",
-            children = listOf(
-                SeedCategory(
-                    title = "پست هوایی تک پایه",
-                    items = listOf(
-                        "هات‌لاین",
-                        "برقگیر پلیمری ۲۰ کیلوولت",
-                        "کات اوت پلیمری",
-                        "فیوز لینک",
-                        "کابلشو",
-                        "سکوی ترانس یکطرفه ۱۱۰ سانتی‌متر",
-                        "ترانسفورماتور تک‌فاز",
-                        "ترانسفورماتور سه‌فاز"
-                    )
-                ),
-                SeedCategory(
-                    title = "پست هوایی دو پایه",
-                    items = listOf(
-                        "هات‌لاین",
-                        "برقگیر پلیمری ۲۰ کیلوولت",
-                        "کات اوت پلیمری",
-                        "فیوز لینک",
-                        "کابلشو",
-                        "سکوی ترانسفورماتور دو طرفه نمره ۸",
-                        "سکوی ترانسفورماتور دو طرفه نمره ۱۰",
-                        "سکوی ترانسفورماتور دو طرفه نمره ۱۲",
-                        "سکوی ترانسفورماتور دو طرفه نمره ۱۴",
-                        "ترانسفورماتور تک‌فاز",
-                        "ترانسفورماتور سه‌فاز"
-                    )
-                )
-            )
-        ),
-        SeedCategory(
-            title = "مصالح",
-            items = listOf("سنگ لاشه", "شن و ماسه", "سیمان", "بلوک سیمانی", "آجر"),
-            defaultUnit = "تن"
-        ),
-        SeedCategory(
-            title = "حمل و نقل",
-            items = listOf("جرثقیل", "کرایه تریلی", "کرایه مصالح", "کرایه یراق‌آلات", "کرایه ترانس", "بیل مکانیکی"),
-            defaultUnit = "سرویس"
-        ),
-        SeedCategory(
-            title = "هزینه‌های کارگری",
-            items = listOf("چاله‌کنی", "کارگر روز کاری", "دستمزد شیفته‌ریزی", "حفاری"),
-            defaultUnit = "روز"
-        ),
-        SeedCategory(
-            title = "سایر هزینه‌ها",
+            title = "خط و پست ۲۰ کیلوولت هوایی",
             items = listOf(
-                "دستمزد سیمبان",
-                "هزینه خاموشی شبکه",
-                "هزینه جوشکاری و تراشکاری",
-                "سایر هزینه‌های پیش‌بینی نشده"
+                "کات اوت",
+                "برقگیر پلیمری"
             ),
-            defaultUnit = "سرویس"
+            children = listOf(
+                SeedCategory(
+                    title = "تیر بتنی",
+                    items = listOf(
+                        "تیر ۱۵/۸۰۰", "تیر ۱۵/۶۰۰", "تیر ۱۵/۴۰۰",
+                        "تیر ۱۲/۸۰۰", "تیر ۱۲/۶۰۰", "تیر ۱۲/۴۰۰",
+                        "تیر ۹/۶۰۰", "تیر ۹/۴۰۰", "تیر ۹/۲۰۰"
+                    )
+                ),
+                SeedCategory(
+                    title = "کراس آرم",
+                    items = listOf(
+                        "۳متری نمره ۸", "۳ متری نمره ۷", "۲/۴۴ نمره ۸", "۲/۴۴ نمره ۷",
+                        "۲متری نمره ۸", "۲متری نمره ۷", "۱/۵ متری نمره ۸", "۱/۵ متری نمره ۷",
+                        "تسمه حایل ۷۰/۵/۵", "پشتبند تابلو"
+                    )
+                ),
+                SeedCategory(
+                    title = "پیچ و مهره",
+                    items = listOf(
+                        "پیچ و مهره ۴سانت", "پیچ عدسی ۴سانت",
+                        "دوسر دنده ۶۰۰", "دوسردنده ۵۵۰", "دوسردنده ۵۰۰", "دوسردنده ۴۵۰",
+                        "دوسردنده ۴۰۰", "دو سردنده ۳۵۰", "دوسر دنده ۳۰۰", "دو سردنده ۲۵۰",
+                        "تک سر دنده ۴۰۰", "تک سر دنده ۳۵۰", "تک سر دنده ۳۰۰", "تک سر دنده ۲۵۰"
+                    )
+                ),
+                SeedCategory(
+                    title = "مقره و لوازم مربوطه",
+                    items = listOf(
+                        "مهره چشمی", "شیگل و پین و اپلیت", "مقره کششی پلیمری", "گیره انتهایی",
+                        "سیم‌گیر ۷۰", "مقره سوزنی پلیمری", "مقره سوزنی سرامیکی",
+                        "راس تیر ناودانی بلند", "پین کناری بلند"
+                    )
+                ),
+                SeedCategory(
+                    title = "ترانسفورماتور",
+                    items = listOf(
+                        "تکفاز ۱۰kva", "تکفاز ۱۵kva", "تک فاز ۲۵kva",
+                        "سه فاز ۲۵kva", "سه فاز ۵۰kva", "سه فاز ۷۵kva", "سه فاز ۱۰۰kva",
+                        "سه فاز ۱۶۰kva", "سه فاز ۲۰۰kva", "سه فاز ۲۵۰kva", "سه فاز ۳۱۵kva",
+                        "سه فاز ۴۰۰kva"
+                    )
+                ),
+                SeedCategory(
+                    title = "کابل‌ها",
+                    defaultUnit = "متر",
+                    items = listOf(
+                        "آلومینیومی ۱۲۰+۲۴۰*۳", "آلومینیومی ۹۵+۱۸۵*۳", "آلومینیومی ۵۰+۹۵*۳",
+                        "آلومینیومی ۲۵+۵۰*۳", "آلومینیومی ۱۶*۴", "کابل فولادی ۵۰",
+                        "کابل مسی ۵۰ مسی", "هادی روکش دار مینک"
+                    )
+                ),
+                SeedCategory(
+                    title = "کابلشو",
+                    items = listOf(
+                        "بی متال ۲۴۰", "بی متال ۱۸۵", "بی متال ۱۲۰", "بی متال ۹۵",
+                        "بی متال ۷۰", "بی متال ۵۰", "بی متال ۳۵", "بی متال ۲۵", "بی متال ۱۶",
+                        "پرسی ۵۰", "فول بیمتال ۷۰", "فول بیمتال ۵۰", "شیرینگ حرارتی"
+                    )
+                ),
+                SeedCategory(
+                    title = "کلمپ و گیره",
+                    items = listOf(
+                        "گیره هات لاین", "زین هات لاین", "رکاب هات لاین",
+                        "کلمپ دو پیچه آلومینیومی", "کلمپ بی متال ۵۰", "کلمپ دوپیچه دوطرف دندانه دار"
+                    )
+                ),
+                SeedCategory(
+                    title = "کاور",
+                    items = listOf(
+                        "بوشینگ ترانس", "کات اوت", "برقگیر", "کلمپ",
+                        "مقره سوزنی سرامیکی", "مقره سوزنی پلیمری", "کنسول با لوله ۴ اینچ"
+                    )
+                ),
+                SeedCategory(
+                    title = "سکوها",
+                    items = listOf(
+                        "کات اوت و برق گیر یک طرفه", "ترانس یک طرفه ۱۱۰ سانت",
+                        "ترانس دو طرفه نمره ۸", "ترانس دوطرفه نمره ۱۰", "ترانس دوطرفه نمره ۱۲"
+                    )
+                ),
+                SeedCategory(
+                    title = "سیستم ارتینگ",
+                    items = listOf(
+                        "میله ارت دو متری", "میله ارت ۱/۵ متری", "کلمپ انگشتی میله ارت", "خاک بنتونیت"
+                    )
+                ),
+                SeedCategory(
+                    title = "لوله",
+                    items = listOf(
+                        "پلی اتیلن ۳ اینچ", "پلی اتیلن ۲ اینچ", "پلی اتیلن ۳/۴ اینچ"
+                    )
+                ),
+                SeedCategory(
+                    title = "تابلو",
+                    items = listOf("تیپ یک", "تیپ ۲")
+                ),
+                SeedCategory(
+                    title = "هزینه‌های اجرایی",
+                    defaultUnit = "سرویس",
+                    items = listOf(
+                        "چاله کنی تیر", "چاله ارت و کانال", "سنگ لاشه", "سیمان", "شن و ماسه",
+                        "بتن آماده", "کارگر روز کاری", "جوشکاری و تراشکاری",
+                        "حمل و نقل وسایل و ترانس", "تریلی",
+                        "جرثقیل (بارگیری/تخلیه/تیرگذاری/نصب ترانس)", "خاموشی شبکه", "دستمزد سیمبان"
+                    )
+                )
+            )
         ),
         SeedCategory(
-            title = "هزینه‌های اجرایی و اداری شرکت",
-            items = listOf("هزینه اجرایی و اداری شرکت"),
-            defaultUnit = "سرویس"
+            title = "فشار ضعیف ۴۰۰ ولت"
+        ),
+        SeedCategory(
+            title = "پست زمینی ۲۰ کیلوولت"
         )
     )
 
     suspend fun populate(database: AppDatabase) {
-        if (database.catalogItemDao().count() > 0) return
+        val savedVersion = database.settingsDao().get(SETTINGS_KEY_CATALOG_SEED_VERSION)
+        if (savedVersion == CATALOG_SEED_VERSION) return
+
+        // بازسازی کامل بانک تجهیزات (دسته‌ها/واحدها/آیتم‌ها). این کار هرگز روی
+        // پیش‌فاکتورهای ثبت‌شده‌ی قبلی اثر نمی‌گذارد چون تمام اطلاعات آن‌ها به‌صورت
+        // Snapshot مستقل در جدول quotation_item نگهداری می‌شود.
+        database.catalogItemDao().deleteAll()
+        database.categoryDao().deleteAll()
+        database.unitDao().deleteAll()
 
         val unitIdByName = mutableMapOf<String, Long>()
         units.forEach { unitName ->
@@ -132,14 +170,15 @@ object SeedData {
             val categoryId = database.categoryDao().insert(
                 CategoryEntity(title = seed.title, parentId = parentId, sortOrder = sortOrder)
             )
-            seed.items.forEachIndexed { _, itemTitle ->
+            seed.items.forEachIndexed { itemIndex, itemTitle ->
                 val unitId = unitIdByName[seed.defaultUnit] ?: unitIdByName["عدد"]!!
                 database.catalogItemDao().insert(
                     CatalogItemEntity(
                         categoryId = categoryId,
                         title = itemTitle,
                         unitId = unitId,
-                        currentPrice = 0L
+                        currentPrice = 0L,
+                        sortOrder = itemIndex
                     )
                 )
             }
@@ -151,5 +190,7 @@ object SeedData {
         rootCategories.forEachIndexed { idx, root ->
             insertCategoryTree(root, null, idx)
         }
+
+        database.settingsDao().set(SettingsEntity(SETTINGS_KEY_CATALOG_SEED_VERSION, CATALOG_SEED_VERSION))
     }
 }

@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CatalogItemDao {
-    @Query("SELECT * FROM catalog_item WHERE categoryId = :categoryId AND isActive = 1 ORDER BY title")
+    @Query("SELECT * FROM catalog_item WHERE categoryId = :categoryId AND isActive = 1 ORDER BY sortOrder")
     fun observeByCategory(categoryId: Long): Flow<List<CatalogItemEntity>>
 
     @Query("""SELECT * FROM catalog_item WHERE isActive = 1 AND title LIKE '%' || :query || '%'
@@ -33,4 +33,7 @@ interface CatalogItemDao {
 
     @Query("SELECT COUNT(*) FROM catalog_item")
     suspend fun count(): Int
+
+    @Query("DELETE FROM catalog_item")
+    suspend fun deleteAll()
 }

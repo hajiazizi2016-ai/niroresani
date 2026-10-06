@@ -22,5 +22,6 @@ data class CatalogItemEntity(
     val currentPrice: Long = 0L,
     val priceUpdatedAt: Long = System.currentTimeMillis(),
     val isActive: Boolean = true,
-    val createdAt: Long = System.currentTimeMillis()
+    val createdAt: Long = System.currentTimeMillis(),
+    val sortOrder: Int = 0
 )
