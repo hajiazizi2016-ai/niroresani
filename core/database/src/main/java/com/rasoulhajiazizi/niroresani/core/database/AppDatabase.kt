@@ -2,6 +2,7 @@ package com.rasoulhajiazizi.niroresani.core.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.rasoulhajiazizi.niroresani.core.database.dao.CatalogItemDao
 import com.rasoulhajiazizi.niroresani.core.database.dao.CategoryDao
 import com.rasoulhajiazizi.niroresani.core.database.dao.CompanyDao
@@ -36,7 +37,7 @@ import com.rasoulhajiazizi.niroresani.core.database.entity.UnitEntity
         SettingsEntity::class,
         SecurityEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -53,5 +54,28 @@ abstract class AppDatabase : RoomDatabase() {
 
     companion object {
         const val DATABASE_NAME = "niroresani.db"
+    }
+}
+
+/**
+ * Migration نسخه ۱ به ۲ - افزودن فیلدهای جدید شرکت (شناسه ملی، شماره اقتصادی، کدپستی،
+ * تلفن همراه، نمابر، آدرس، امضا) و مشتری (نوع عنوان، موضوع طرح، کد طرح، تماس).
+ * طبق اصل ثابت پروژه، هرگز fallbackToDestructiveMigration استفاده نمی‌شود - داده‌های
+ * موجود کاربران باید در ارتقا حفظ شوند.
+ */
+val MIGRATION_1_2 = object : androidx.room.migration.Migration(1, 2) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE company ADD COLUMN nationalId TEXT DEFAULT NULL")
+        db.execSQL("ALTER TABLE company ADD COLUMN economicCode TEXT DEFAULT NULL")
+        db.execSQL("ALTER TABLE company ADD COLUMN postalCode TEXT DEFAULT NULL")
+        db.execSQL("ALTER TABLE company ADD COLUMN mobile TEXT DEFAULT NULL")
+        db.execSQL("ALTER TABLE company ADD COLUMN fax TEXT DEFAULT NULL")
+        db.execSQL("ALTER TABLE company ADD COLUMN address TEXT DEFAULT NULL")
+        db.execSQL("ALTER TABLE company ADD COLUMN signaturePath TEXT DEFAULT NULL")
+
+        db.execSQL("ALTER TABLE customer ADD COLUMN titleType TEXT NOT NULL DEFAULT 'آقای'")
+        db.execSQL("ALTER TABLE customer ADD COLUMN planSubject TEXT DEFAULT NULL")
+        db.execSQL("ALTER TABLE customer ADD COLUMN planCode TEXT DEFAULT NULL")
+        db.execSQL("ALTER TABLE customer ADD COLUMN phone TEXT DEFAULT NULL")
     }
 }

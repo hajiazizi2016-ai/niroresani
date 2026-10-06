@@ -9,6 +9,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -63,12 +64,21 @@ fun CompanyScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     var pendingExitAfterSave by remember { mutableStateOf(false) }
 
-    val imagePicker = rememberLauncherForActivityResult(
+    val logoPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let {
-            val savedPath = copyLogoToInternalStorage(context, it)
+            val savedPath = copyImageToInternalStorage(context, it, "logo", "company_logo.jpg")
             if (savedPath != null) viewModel.onLogoPicked(savedPath)
+        }
+    }
+
+    val signaturePicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            val savedPath = copyImageToInternalStorage(context, it, "signature", "company_signature.jpg")
+            if (savedPath != null) viewModel.onSignaturePicked(savedPath)
         }
     }
 
@@ -109,11 +119,23 @@ fun CompanyScreen(
         }
     ) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding).padding(20.dp)) {
-            LogoPicker(
-                logoPath = uiState.logoPath,
-                onPickClick = { imagePicker.launch("image/*") },
-                onRemoveClick = { viewModel.onLogoRemoved() }
-            )
+            Row(modifier = Modifier.fillMaxWidth()) {
+                ImagePicker(
+                    modifier = Modifier.weight(1f),
+                    label = "لوگوی شرکت",
+                    imagePath = uiState.logoPath,
+                    onPickClick = { logoPicker.launch("image/*") },
+                    onRemoveClick = { viewModel.onLogoRemoved() }
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                ImagePicker(
+                    modifier = Modifier.weight(1f),
+                    label = "امضای زیر سند",
+                    imagePath = uiState.signaturePath,
+                    onPickClick = { signaturePicker.launch("image/*") },
+                    onRemoveClick = { viewModel.onSignatureRemoved() }
+                )
+            }
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -137,6 +159,66 @@ fun CompanyScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
+            Spacer(modifier = Modifier.height(12.dp))
+
+            OutlinedTextField(
+                value = uiState.nationalId,
+                onValueChange = viewModel::onNationalIdChange,
+                label = { Text("شناسه ملی") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            OutlinedTextField(
+                value = uiState.economicCode,
+                onValueChange = viewModel::onEconomicCodeChange,
+                label = { Text("شماره اقتصادی") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            OutlinedTextField(
+                value = uiState.postalCode,
+                onValueChange = viewModel::onPostalCodeChange,
+                label = { Text("کدپستی") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Row(modifier = Modifier.fillMaxWidth()) {
+                OutlinedTextField(
+                    value = uiState.mobile,
+                    onValueChange = viewModel::onMobileChange,
+                    label = { Text("تلفن همراه") },
+                    singleLine = true,
+                    modifier = Modifier.weight(1f)
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                OutlinedTextField(
+                    value = uiState.fax,
+                    onValueChange = viewModel::onFaxChange,
+                    label = { Text("نمابر") },
+                    singleLine = true,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            OutlinedTextField(
+                value = uiState.address,
+                onValueChange = viewModel::onAddressChange,
+                label = { Text("آدرس") },
+                minLines = 2,
+                modifier = Modifier.fillMaxWidth()
+            )
+
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
@@ -146,51 +228,62 @@ fun CompanyScreen(
             ) {
                 Text(if (uiState.isSaving) "در حال ذخیره..." else "ذخیره اطلاعات")
             }
+
+            Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }
 
 @Composable
-private fun LogoPicker(logoPath: String?, onPickClick: () -> Unit, onRemoveClick: () -> Unit) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+private fun ImagePicker(
+    modifier: Modifier = Modifier,
+    label: String,
+    imagePath: String?,
+    onPickClick: () -> Unit,
+    onRemoveClick: () -> Unit
+) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier) {
+        Text(label, style = MaterialTheme.typography.labelLarge)
+        Spacer(modifier = Modifier.height(8.dp))
         Box(
             modifier = Modifier
-                .size(120.dp)
+                .size(100.dp)
                 .clip(RoundedCornerShape(12.dp))
                 .background(MaterialTheme.colorScheme.surfaceVariant)
                 .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp))
                 .clickable(onClick = onPickClick),
             contentAlignment = Alignment.Center
         ) {
-            if (logoPath != null) {
+            if (imagePath != null) {
                 AsyncImage(
-                    model = File(logoPath),
-                    contentDescription = "لوگوی شرکت",
+                    model = File(imagePath),
+                    contentDescription = label,
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )
             } else {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(Icons.Default.Upload, contentDescription = null)
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text("انتخاب لوگو", style = MaterialTheme.typography.labelLarge)
-                }
+                Icon(Icons.Default.Upload, contentDescription = null)
             }
         }
-        if (logoPath != null) {
+        if (imagePath != null) {
             TextButton(onClick = onRemoveClick) {
                 Icon(Icons.Default.Close, contentDescription = null, modifier = Modifier.size(16.dp))
                 Spacer(modifier = Modifier.width(4.dp))
-                Text("حذف لوگو")
+                Text("حذف", style = MaterialTheme.typography.labelLarge)
             }
         }
     }
 }
 
-private fun copyLogoToInternalStorage(context: Context, uri: Uri): String? {
+private fun copyImageToInternalStorage(
+    context: Context,
+    uri: Uri,
+    folderName: String,
+    fileName: String
+): String? {
     return try {
-        val logoDir = File(context.filesDir, "logo").apply { mkdirs() }
-        val destFile = File(logoDir, "company_logo.jpg")
+        val dir = File(context.filesDir, folderName).apply { mkdirs() }
+        val destFile = File(dir, fileName)
         context.contentResolver.openInputStream(uri)?.use { input ->
             FileOutputStream(destFile).use { output -> input.copyTo(output) }
         }

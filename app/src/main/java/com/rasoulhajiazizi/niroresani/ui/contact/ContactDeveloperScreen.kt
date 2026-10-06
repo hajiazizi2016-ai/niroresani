@@ -35,6 +35,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 
+/**
+ * اطلاعات تماس سازنده برنامه.
+ * شماره واتس‌اپ و آیدی تلگرام اینجا نگه داشته می‌شود تا در صورت نیاز
+ * به‌سادگی قابل ویرایش باشد.
+ */
 private const val DEVELOPER_NAME = "رسول حاجی عزیزی"
 private const val WHATSAPP_NUMBER = "09143467035"
 private const val TELEGRAM_USERNAME = "amir_hajiazizi"
@@ -99,7 +104,7 @@ fun ContactDeveloperScreen(onBack: () -> Unit) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(Icons.Default.Engineering, contentDescription = null, modifier = Modifier.size(32.dp))
-Spacer(modifier = Modifier.width(12.dp))
+                    Spacer(modifier = Modifier.width(12.dp))
                     Column {
                         Text("طراحی و توسعه", style = MaterialTheme.typography.labelMedium)
                         Spacer(modifier = Modifier.height(2.dp))

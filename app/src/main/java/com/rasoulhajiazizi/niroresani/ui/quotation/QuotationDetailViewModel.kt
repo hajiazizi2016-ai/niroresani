@@ -22,7 +22,8 @@ data class QuotationDetailUiState(
     val customerAddress: String = "",
     val companyName: String = "",
     val companyRegistrationNumber: String = "",
-    val companyLogoPath: String? = null
+    val companyLogoPath: String? = null,
+    val companySignaturePath: String? = null
 )
 
 @HiltViewModel
@@ -51,14 +52,18 @@ class QuotationDetailViewModel @Inject constructor(
             var companyName = ""
             var companyRegistrationNumber = ""
             var companyLogoPath: String? = null
+            var companySignaturePath: String? = null
             try {
                 val customerJson = JSONObject(quotation.customerSnapshotJson)
-                customerName = "${customerJson.optString("firstName")} ${customerJson.optString("lastName")}"
+                val titleType = customerJson.optString("titleType")
+                val namePart = "${customerJson.optString("firstName")} ${customerJson.optString("lastName")}".trim()
+                customerName = if (titleType.isNotBlank()) "$titleType $namePart".trim() else namePart
                 customerAddress = customerJson.optString("address")
                 val companyJson = JSONObject(quotation.companySnapshotJson)
                 companyName = companyJson.optString("name")
                 companyRegistrationNumber = companyJson.optString("registrationNumber")
                 companyLogoPath = companyJson.optString("logoPath").ifBlank { null }
+                companySignaturePath = companyJson.optString("signaturePath").ifBlank { null }
             } catch (e: Exception) {
                 // نادیده گرفتن خطای احتمالی پارس JSON قدیمی
             }
@@ -70,7 +75,8 @@ class QuotationDetailViewModel @Inject constructor(
                 customerAddress = customerAddress,
                 companyName = companyName,
                 companyRegistrationNumber = companyRegistrationNumber,
-                companyLogoPath = companyLogoPath
+                companyLogoPath = companyLogoPath,
+                companySignaturePath = companySignaturePath
             )
         }
     }

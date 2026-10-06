@@ -1,6 +1,7 @@
 package com.rasoulhajiazizi.niroresani.ui.customer
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -23,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.rasoulhajiazizi.niroresani.core.database.entity.CustomerTitleType
 import com.rasoulhajiazizi.niroresani.ui.common.UnsavedChangesGuard
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -59,12 +62,48 @@ fun CustomerFormScreen(
         }
     ) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding).padding(20.dp)) {
+            Text("نوع مشتری")
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(modifier = Modifier.fillMaxWidth()) {
+                listOf(CustomerTitleType.COMPANY, CustomerTitleType.MR, CustomerTitleType.MRS).forEach { type ->
+                    FilterChip(
+                        selected = uiState.titleType == type,
+                        onClick = { viewModel.onTitleTypeChange(type) },
+                        label = { Text(type) },
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             OutlinedTextField(
                 value = uiState.firstName,
                 onValueChange = viewModel::onFirstNameChange,
-                label = { Text("نام") },
+                label = { Text(if (uiState.titleType == CustomerTitleType.COMPANY) "نام شرکت" else "نام") },
                 isError = uiState.firstNameError != null,
                 supportingText = { uiState.firstNameError?.let { Text(it) } },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            if (uiState.titleType != CustomerTitleType.COMPANY) {
+                Spacer(modifier = Modifier.height(12.dp))
+                OutlinedTextField(
+                    value = uiState.lastName,
+                    onValueChange = viewModel::onLastNameChange,
+                    label = { Text("نام خانوادگی") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            OutlinedTextField(
+                value = uiState.planSubject,
+                onValueChange = viewModel::onPlanSubjectChange,
+                label = { Text("موضوع طرح") },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -72,9 +111,19 @@ fun CustomerFormScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             OutlinedTextField(
-                value = uiState.lastName,
-                onValueChange = viewModel::onLastNameChange,
-                label = { Text("نام خانوادگی") },
+                value = uiState.planCode,
+                onValueChange = viewModel::onPlanCodeChange,
+                label = { Text("کد طرح") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            OutlinedTextField(
+                value = uiState.phone,
+                onValueChange = viewModel::onPhoneChange,
+                label = { Text("شماره تماس") },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )

@@ -10,20 +10,22 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 
 private val LightColors = lightColorScheme(
-    primary = NavyPrimary,
-    onPrimary = SurfaceLight,
+    primary = SkyBlue,
+    onPrimary = White,
     secondary = AccentOrange,
-    background = SurfaceLight,
+    background = White,
     surface = SurfaceLight,
     onBackground = TextPrimaryLight,
     onSurface = TextPrimaryLight,
     error = ErrorRed
 )
 
+// حتی در تم تاریک سیستم، به‌جای پس‌زمینهٔ تقریبا سیاه قبلی، از آبی آسمانی تیره استفاده می‌شود
+// تا صفحه اصلی هیچ‌وقت حس «مشکی و ناخوشایند» ندهد (بخش ۱ درخواست اصلاحات).
 private val DarkColors = darkColorScheme(
-    primary = AccentOrange,
-    onPrimary = SurfaceDark,
-    secondary = NavyPrimary,
+    primary = SkyBlue,
+    onPrimary = White,
+    secondary = AccentOrange,
     background = SurfaceDark,
     surface = SurfaceDark,
     onBackground = TextPrimaryDark,

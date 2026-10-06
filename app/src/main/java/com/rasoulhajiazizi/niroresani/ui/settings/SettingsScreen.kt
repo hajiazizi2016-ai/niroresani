@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Apartment
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Backup
 import androidx.compose.material.icons.filled.ChevronLeft
+import androidx.compose.material.icons.filled.Inventory
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -36,11 +37,13 @@ private data class SettingsItem(val title: String, val icon: ImageVector, val ro
 fun SettingsScreen(
     onBack: () -> Unit,
     onCompanyClick: () -> Unit,
+    onCatalogClick: () -> Unit,
     onSecurityClick: () -> Unit,
     onBackupClick: () -> Unit
 ) {
     val items = listOf(
         SettingsItem("اطلاعات شرکت", Icons.Default.Apartment, "company"),
+        SettingsItem("بانک تجهیزات", Icons.Default.Inventory, "catalog"),
         SettingsItem("امنیت", Icons.Default.Security, "security"),
         SettingsItem("پشتیبان‌گیری و بازیابی", Icons.Default.Backup, "backup")
     )
@@ -66,6 +69,7 @@ fun SettingsScreen(
                     onClick = {
                         when (item.route) {
                             "company" -> onCompanyClick()
+                            "catalog" -> onCatalogClick()
                             "security" -> onSecurityClick()
                             "backup" -> onBackupClick()
                         }

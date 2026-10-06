@@ -20,7 +20,6 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -60,13 +59,14 @@ fun CustomerListScreen(
                     IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowForward, contentDescription = "بازگشت")
                     }
+                },
+                // دکمهٔ «+» در گوشهٔ سمت چپ برای تعریف مشتری جدید - بخش ۴-الف درخواست اصلاحات
+                actions = {
+                    IconButton(onClick = onAddClick) {
+                        Icon(Icons.Default.Add, contentDescription = "افزودن مشتری")
+                    }
                 }
             )
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = onAddClick) {
-                Icon(Icons.Default.Add, contentDescription = "افزودن مشتری")
-            }
         }
     ) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding)) {
@@ -98,7 +98,6 @@ fun CustomerListScreen(
                             onDeleteClick = { customerToDelete = customer }
                         )
                     }
-                    item { Spacer(modifier = Modifier.height(72.dp)) }
                 }
             }
         }
@@ -130,7 +129,21 @@ private fun CustomerRow(customer: CustomerEntity, onClick: () -> Unit, onDeleteC
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text("${customer.firstName} ${customer.lastName}", style = MaterialTheme.typography.titleMedium)
+                val displayName = if (customer.titleType == com.rasoulhajiazizi.niroresani.core.database.entity.CustomerTitleType.COMPANY) {
+                    customer.firstName
+                } else {
+                    "${customer.titleType} ${customer.firstName} ${customer.lastName}".trim()
+                }
+                Text(displayName, style = MaterialTheme.typography.titleMedium)
+                if (!customer.planCode.isNullOrBlank()) {
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        "کد طرح: ${customer.planCode}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        maxLines = 1
+                    )
+                }
                 if (customer.address.isNotBlank()) {
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(

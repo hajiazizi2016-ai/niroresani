@@ -3,6 +3,8 @@ package com.rasoulhajiazizi.niroresani
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -42,12 +44,15 @@ private fun AppRoot(startupViewModel: AppStartupViewModel = hiltViewModel()) {
     var isUnlocked by remember { mutableStateOf(false) }
     val startupState by startupViewModel.uiState.collectAsState()
 
-    when {
-        showSplash -> SplashScreen(onFinished = { showSplash = false })
-        startupState.isLoading -> { /* صبر کوتاه برای بررسی وضعیت رمز - بدون UI اضافه */ }
-        startupState.isPasswordRequired && !isUnlocked -> {
-            LockScreen(onUnlocked = { isUnlocked = true })
+    // انتقال نرم (Crossfade) از اسپلش به صفحهٔ بعدی - بخش ۱ درخواست اصلاحات
+    Crossfade(targetState = showSplash, animationSpec = tween(durationMillis = 500), label = "splash_transition") { stillOnSplash ->
+        when {
+            stillOnSplash -> SplashScreen(onFinished = { showSplash = false })
+            startupState.isLoading -> { /* صبر کوتاه برای بررسی وضعیت رمز - بدون UI اضافه */ }
+            startupState.isPasswordRequired && !isUnlocked -> {
+                LockScreen(onUnlocked = { isUnlocked = true })
+            }
+            else -> NiroResaniNavGraph()
         }
-        else -> NiroResaniNavGraph()
     }
 }

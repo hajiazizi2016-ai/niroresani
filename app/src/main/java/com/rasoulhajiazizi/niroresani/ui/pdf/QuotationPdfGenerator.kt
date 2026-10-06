@@ -50,6 +50,7 @@ object QuotationPdfGenerator {
         companyName: String,
         registrationNumber: String,
         logoPath: String?,
+        companySignaturePath: String? = null,
         customerName: String,
         customerAddress: String
     ): PdfResult {
@@ -120,7 +121,7 @@ object QuotationPdfGenerator {
             y = drawRepeatHeader(canvas, y, quotation, headerPaint)
         }
 
-        y = drawTotalAndFooter(canvas, y, quotation, headerPaint, bodyPaint, smallPaint)
+        y = drawTotalAndFooter(canvas, y, quotation, headerPaint, bodyPaint, smallPaint, companySignaturePath)
         drawPageNumber(canvas, pageIndex, totalPages, smallPaint)
         pdfDocument.finishPage(page)
 
@@ -316,7 +317,8 @@ object QuotationPdfGenerator {
         quotation: QuotationEntity,
         headerPaint: TextPaint,
         bodyPaint: TextPaint,
-        smallPaint: TextPaint
+        smallPaint: TextPaint,
+        companySignaturePath: String? = null
     ): Float {
         var y = startY + 10f
 
@@ -334,6 +336,20 @@ object QuotationPdfGenerator {
 
         y += 20f
         // محل امضا: راست = مشتری، چپ = شرکت (چون صفحه RTL است، امضای شرکت باید سمت چپ ظاهری باشد)
+        // در صورت وجود تصویر امضای شرکت، بالای خط امضا رسم می‌شود - بخش ۲ درخواست اصلاحات
+        if (!companySignaturePath.isNullOrBlank()) {
+            try {
+                val sigBitmap = BitmapFactory.decodeFile(companySignaturePath)
+                if (sigBitmap != null) {
+                    val sigWidth = 120f
+                    val sigHeight = 40f
+                    val scaled = android.graphics.Bitmap.createScaledBitmap(sigBitmap, sigWidth.toInt(), sigHeight.toInt(), true)
+                    canvas.drawBitmap(scaled, MARGIN + 15f, y - sigHeight - 4f, null)
+                }
+            } catch (e: Exception) {
+                // نادیده گرفتن خطای بارگذاری امضا - سند بدون امضا هم معتبر است
+            }
+        }
         canvas.drawLine(MARGIN, y, MARGIN + 150f, y, Paint().apply { strokeWidth = 0.7f })
         drawLtrAlignedText(canvas, "مهر و امضای شرکت", smallPaint, MARGIN, y + 4f, 150f)
 

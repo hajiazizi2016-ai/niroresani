@@ -165,15 +165,26 @@ class QuotationReviewViewModel @Inject constructor(
         return JSONObject().apply {
             put("name", company?.name ?: "")
             put("registrationNumber", company?.registrationNumber ?: "")
+            put("nationalId", company?.nationalId ?: "")
+            put("economicCode", company?.economicCode ?: "")
+            put("postalCode", company?.postalCode ?: "")
+            put("mobile", company?.mobile ?: "")
+            put("fax", company?.fax ?: "")
+            put("address", company?.address ?: "")
             put("logoPath", company?.logoPath ?: "")
+            put("signaturePath", company?.signaturePath ?: "")
         }.toString()
     }
 
     private suspend fun buildCustomerSnapshot(customerId: Long): String {
         val customer = customerDao.getById(customerId)
         return JSONObject().apply {
+            put("titleType", customer?.titleType ?: "")
             put("firstName", customer?.firstName ?: "")
             put("lastName", customer?.lastName ?: "")
+            put("planSubject", customer?.planSubject ?: "")
+            put("planCode", customer?.planCode ?: "")
+            put("phone", customer?.phone ?: "")
             put("address", customer?.address ?: "")
         }.toString()
     }

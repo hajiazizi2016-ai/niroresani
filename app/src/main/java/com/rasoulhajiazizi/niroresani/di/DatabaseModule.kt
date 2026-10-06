@@ -3,6 +3,7 @@ package com.rasoulhajiazizi.niroresani.di
 import android.content.Context
 import androidx.room.Room
 import com.rasoulhajiazizi.niroresani.core.database.AppDatabase
+import com.rasoulhajiazizi.niroresani.core.database.MIGRATION_1_2
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,7 +22,9 @@ object DatabaseModule {
             context,
             AppDatabase::class.java,
             AppDatabase.DATABASE_NAME
-        ).build()
+        )
+            .addMigrations(MIGRATION_1_2)
+            .build()
     }
 
     @Provides

@@ -91,6 +91,7 @@ fun QuotationDetailScreen(
                                                 companyName = uiState.companyName,
                                                 registrationNumber = uiState.companyRegistrationNumber,
                                                 logoPath = uiState.companyLogoPath,
+                                                companySignaturePath = uiState.companySignaturePath,
                                                 customerName = uiState.customerName,
                                                 customerAddress = uiState.customerAddress
                                             )

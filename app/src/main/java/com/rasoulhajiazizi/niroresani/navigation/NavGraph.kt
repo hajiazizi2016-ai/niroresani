@@ -23,7 +23,7 @@ import com.rasoulhajiazizi.niroresani.ui.security.SecurityScreen
 import com.rasoulhajiazizi.niroresani.ui.settings.SettingsScreen
 
 /**
- * ریشه ناوبری کامل برنامه (فازهای ۱ تا ۱۰).
+ * ریشه ناوبری کامل برنامه (فازهای ۱ تا ۱۱).
  */
 @Composable
 fun NiroResaniNavGraph() {
@@ -33,19 +33,18 @@ fun NiroResaniNavGraph() {
 
         composable(Routes.HOME) {
             HomeScreen(
-                onMenuItemClick = { title ->
-                    when (title) {
-                        "شرکت" -> navController.navigate(Routes.COMPANY)
-                        "مشتری" -> navController.navigate(Routes.CUSTOMER_LIST)
-                        "تجهیزات" -> navController.navigate(Routes.catalogRoute(null, "بانک تجهیزات"))
-                        "پیش‌فاکتور" -> navController.navigate(Routes.QUOTATION_LIST)
-                        else -> navController.navigate(Routes.comingSoonRoute(title))
+                onMenuItemClick = { key ->
+                    when (key) {
+                        "customers_list" -> navController.navigate(Routes.CUSTOMER_LIST)
+                        "quotation_new" -> navController.navigate(Routes.QUOTATION_CUSTOMER_PICKER)
+                        "invoices_list" -> navController.navigate(Routes.QUOTATION_LIST)
+                        "reports_soon" -> navController.navigate(Routes.comingSoonRoute("گزارشات"))
+                        "warehouse_soon" -> navController.navigate(Routes.comingSoonRoute("انبار"))
+                        else -> navController.navigate(Routes.comingSoonRoute(key))
                     }
                 },
                 onSettingsClick = { navController.navigate(Routes.SETTINGS) },
-                onContactDeveloperClick = { navController.navigate(Routes.CONTACT_DEVELOPER) },
-                onSearchClick = { navController.navigate(Routes.QUOTATION_LIST) },
-                onNewQuotationClick = { navController.navigate(Routes.QUOTATION_CUSTOMER_PICKER) }
+                onContactDeveloperClick = { navController.navigate(Routes.CONTACT_DEVELOPER) }
             )
         }
 
@@ -61,6 +60,7 @@ fun NiroResaniNavGraph() {
             SettingsScreen(
                 onBack = { navController.popBackStack() },
                 onCompanyClick = { navController.navigate(Routes.COMPANY) },
+                onCatalogClick = { navController.navigate(Routes.catalogRoute(null, "بانک تجهیزات")) },
                 onSecurityClick = { navController.navigate(Routes.SECURITY) },
                 onBackupClick = { navController.navigate(Routes.BACKUP) }
             )
